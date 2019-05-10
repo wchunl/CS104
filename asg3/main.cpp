@@ -101,13 +101,18 @@ int main (int argc, char** argv) {
                                     find('.'));
     string str_out_name = basename + ".str";
     string tok_out_name = basename + ".tok";
+    string ast_out_name = basename + ".ast";
 
     // Open token file for streaming
     tok_out = fopen(tok_out_name.c_str(),"w");
     if(tok_out == NULL){
         exec::exit_status = EXIT_FAILURE;
     }else{
+        //Call yyparse()
         // Call yylex() on file, mem leaks ignored
+        if(!EOF){
+            yyparse();
+        }
         for(;;){
             int t = yylex();
             if(t == YYEOF) break;
@@ -123,6 +128,10 @@ int main (int argc, char** argv) {
     FILE* str_out = fopen(str_out_name.c_str(),"w");
     string_set::dump(str_out);
     int fclose_rc = fclose(str_out);
+    if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
+    FILE* ast_out = fopen(ast_out_name.c_str(),"w");
+    astree::dump(ast_out,parser::root);
+    fclose_rc = fclose(ast_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
     return exec::exit_status;
