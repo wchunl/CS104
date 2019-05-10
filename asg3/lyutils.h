@@ -24,7 +24,7 @@ extern FILE* yyin;
 extern char* yytext; 
 extern int yy_flex_debug;
 extern int yydebug;
-extern size_t yyleng; 
+extern int yyleng; 
 extern FILE* tok_out;
 
 int yylex();

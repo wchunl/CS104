@@ -135,7 +135,8 @@
 			  | TOK_ALLOC '<' TOK_STRUCT TOK_IDENT '>' '(' ')' 				{destroy($2,$3,$5,$6,$7); 
 			  																 $4->change_sym(TOK_TYPE_ID);
 			  																 $$ = $1->adopt($4);} 
-			  | TOK_ALLOC '<' TOK_ARRAY  '<' plaintype '>' '>' '(' expr')' 	{destroy($2,$4,$6,$7,$8,$10); 
+			  | TOK_ALLOC '<' TOK_ARRAY  '<' plaintype '>' '>' '(' expr')' 	{destroy($2,$4,$6);
+			  																 destroy($7,$8,$10); 
 			  																 $$ = $1->adopt($3); 
 			  																 $5->change_sym(TOK_TYPE_ID);
 			  																 $$ =$1->adopt($5,$9);}
@@ -185,12 +186,12 @@
 					                                  $$ = func->adopt($1,$2);} 
               ;
 
-    call      : TOK_IDENT '(' exprs ')'  	{ destroy($4);$2->change_sym(TOK_CALL);$$ = $2->adopt($1,$3);} 
-              | TOK_IDENT '(' ')'  	 		{ destroy($3); 2->change_sym(TOK_CALL);$$ = $2->adopt($1);}
+    call      : TOK_IDENT '(' exprs ')'  	{ destroy($4); $2->change_sym(TOK_CALL);$$ = $2->adopt($1,$3); } 
+              | TOK_IDENT '(' ')'  	 		{ destroy($3); $2->change_sym(TOK_CALL);$$ = $2->adopt($1); }
               ;
 
     variable  : TOK_IDENT           	{ $$ = $1; }
-          	  | expr '[' expr ']'  		{ destroy($4); $2->change_sym(TOK_INDEX);$$ = $2->adopt($1,$3);}                              
+          	  | expr '[' expr ']'  		{ destroy($4); $2->change_sym(TOK_INDEX);$$ = $2->adopt($1,$3); }
           	  | expr  '.' TOK_IDENT 	{ $3->change_sym(TOK_FIELD);$$ = $2->adopt($1,$3); }
               ;
 
