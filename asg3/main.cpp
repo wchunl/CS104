@@ -26,6 +26,7 @@ const string cpp_name = "/usr/bin/cpp -nostdinc";
 string cpp_command;
 string OCLIB = "";
 FILE* tok_out;
+int p;
 
 // Open a pipe from the C preprocessor.
 // Exit failure if can't.
@@ -40,12 +41,14 @@ void cpp_popen (string filename) {
         syserrprintf (cpp_command.c_str());
         exit (exec::exit_status);
     }else {
+      //  yyparse();
         if (yy_flex_debug) {
             fprintf (stderr, "-- popen (%s), fileno(yyin) = %d\n",
                     cpp_command.c_str(), fileno (yyin));
         }
-        lexer::newfilename (cpp_command);
+      lexer::newfilename (cpp_command);    
     }
+    p = yyparse();
 }
 
 void cpp_pclose() {
@@ -110,9 +113,6 @@ int main (int argc, char** argv) {
     }else{
         //Call yyparse()
         // Call yylex() on file, mem leaks ignored
-        if(!EOF){
-            yyparse();
-        }
         for(;;){
             int t = yylex();
             if(t == YYEOF) break;
@@ -130,7 +130,13 @@ int main (int argc, char** argv) {
     int fclose_rc = fclose(str_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
     FILE* ast_out = fopen(ast_out_name.c_str(),"w");
-    astree::dump(ast_out,parser::root);
+    if(p){
+       errprintf ("%:parse failed (%d)\n", p);
+    }else{
+        astree::dump(ast_out,parser::root);
+        destroy(parser::root);
+    }
+    
     fclose_rc = fclose(ast_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
