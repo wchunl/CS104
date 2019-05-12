@@ -26,7 +26,6 @@ const string cpp_name = "/usr/bin/cpp -nostdinc";
 string cpp_command;
 string OCLIB = "";
 FILE* tok_out;
-int p;
 
 // Open a pipe from the C preprocessor.
 // Exit failure if can't.
@@ -41,14 +40,12 @@ void cpp_popen (string filename) {
         syserrprintf (cpp_command.c_str());
         exit (exec::exit_status);
     }else {
-      //  yyparse();
         if (yy_flex_debug) {
             fprintf (stderr, "-- popen (%s), fileno(yyin) = %d\n",
                     cpp_command.c_str(), fileno (yyin));
         }
-      lexer::newfilename (cpp_command);    
+        lexer::newfilename (cpp_command);
     }
-    p = yyparse();
 }
 
 void cpp_pclose() {
@@ -108,35 +105,33 @@ int main (int argc, char** argv) {
 
     // Open token file for streaming
     tok_out = fopen(tok_out_name.c_str(),"w");
-    if(tok_out == NULL){
-        exec::exit_status = EXIT_FAILURE;
-    }else{
-        //Call yyparse()
-        // Call yylex() on file, mem leaks ignored
-        for(;;){
-            int t = yylex();
-            if(t == YYEOF) break;
-        }
-    }
+    if(tok_out == NULL) {exec::exit_status = EXIT_FAILURE;}
+    yyparse();
+    // }else{
+    //     //Call yyparse()
+    //     // Call yylex() on file, mem leaks ignored
+    //     if(!EOF){
+    //     }
+    //     for(;;){
+    //         int t = yylex();
+    //         if(t == YYEOF) break;
+    //     }
+    // }
 
-    // Close file and pipe
+    // Close token file and pipe
     fclose(tok_out);
     cpp_pclose();
-    yylex_destroy();
+    // yylex_destroy();
 
     // Dump stringset into str file
     FILE* str_out = fopen(str_out_name.c_str(),"w");
     string_set::dump(str_out);
     int fclose_rc = fclose(str_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
+
+    // Dump tree into ast file
     FILE* ast_out = fopen(ast_out_name.c_str(),"w");
-    if(p){
-       errprintf ("%:parse failed (%d)\n", p);
-    }else{
-        astree::dump(ast_out,parser::root);
-        destroy(parser::root);
-    }
-    
+    astree::dump(ast_out, parser::root);
     fclose_rc = fclose(ast_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
