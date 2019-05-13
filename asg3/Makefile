@@ -79,6 +79,7 @@ clean :
 
 spotless : clean
 	- rm ${EXECBIN} List.*.ps List.*.pdf
+	- rm *.str *.tok *.ast
 
 deps : ${ALLCSRC}
 	@ echo "# ${DEPSFILE} created `date` by ${MAKE}" >${DEPSFILE}

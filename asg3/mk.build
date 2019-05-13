@@ -1,0 +1,14 @@
+#!/bin/bash -x
+# $Id: mk.build,v 1.8 2019-04-18 13:57:20-07 - - $
+#
+# This does the build and runs checksource.
+#
+BINDIR=/afs/cats.ucsc.edu/courses/cmps104a-wm/bin
+if [ -f PARTNER ]; then
+   $BINDIR/partnercheck 2>&1 | tee partnercheck.log
+fi
+CPPFILES=$(ls *.h *.c* | egrep -v 'yylex.cpp|yyparse.h|yyparse.cpp')
+CHECKFILES="$CPPFILES *.[ly] Makefile README"
+$BINDIR/checksource $CHECKFILES 2>&1 | tee checksource.log
+$BINDIR/cpplint.py.perl $CPPFILES 2>&1 | tee cpplint.log
+gmake 2>&1 | tee gmake.log

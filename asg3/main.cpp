@@ -107,16 +107,8 @@ int main (int argc, char** argv) {
     tok_out = fopen(tok_out_name.c_str(),"w");
     if(tok_out == NULL) {exec::exit_status = EXIT_FAILURE;}
     yyparse();
-    // }else{
-    //     //Call yyparse()
-    //     // Call yylex() on file, mem leaks ignored
-    //     if(!EOF){
-    //     }
-    //     for(;;){
-    //         int t = yylex();
-    //         if(t == YYEOF) break;
-    //     }
-    // }
+
+    printf("hello");
 
     // Close token file and pipe
     fclose(tok_out);
@@ -131,7 +123,7 @@ int main (int argc, char** argv) {
 
     // Dump tree into ast file
     FILE* ast_out = fopen(ast_out_name.c_str(),"w");
-    astree::dump(ast_out, parser::root);
+    astree::print(ast_out, parser::root);
     fclose_rc = fclose(ast_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
