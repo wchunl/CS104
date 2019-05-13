@@ -33,16 +33,16 @@
 %token TOK_IDENT TOK_INTCON TOK_CHARCON TOK_STRINGCON
 %token TOK_ROOT TOK_BLOCK TOK_CALL TOK_INITDECL
 %token TOK_VARDECL TOK_RETURNVOID TOK_IFELSE TOK_PARAM
-%token TOK_FUNCTION POS NEG
+%token TOK_FUNCTION POS NEG TOK_PROTOTYPE
 
 %right TOK_IF TOK_ELSE
 %right  '='
-%left TOK_EQ  TOK_NE TOK_GE TOK_LE TOK_GT TOK_LT
+%left TOK_EQ TOK_NE '<' TOK_LE '>' TOK_GE
 %left  '+' '-'
 %left  '*' '/' '%'
-%right POS NEG '!'
-%left TOK_ARRAY TOK_FIELD TOK_FUNCTION TOK_ALLOC
-%left  "->" '['
+%right POS NEG TOK_NOT
+%left '[' TOK_ARROW TOK_CALL TOK_ALLOC
+%nonassoc '('
 
 
 
@@ -62,10 +62,26 @@
             |                   { $$ = parser::root; }
             ;
 
-    structdef: TOK_STRUCT TOK_IDENT '{' identdecls ';' '}' ';' 
+    /*structdef: TOK_STRUCT TOK_IDENT '{' identdecls ';' '}' ';' 
                 {destroy($3,$5,$6,$7);$2->change_sym(TOK_TYPE_ID);
                 $$ = $1->adopt($2,$4);}
-             ;
+             ;*/
+
+     structdef : args '}' ';' { 
+                 $$ = $1;
+                 destroy($2,$3); } 
+              | TOK_STRUCT TOK_IDENT '{' '}' ';' { 
+                 $$ = $1->adopt($2);    
+                 destroy($3,$4,$5);}      
+          ;
+
+     args     : args identdecl ';'{ 
+                  $$ = $1->adopt($2);
+                  destroy($3); }
+             | TOK_STRUCT TOK_IDENT '{' identdecl';' {
+              $$ = $1->adopt($2,$4);
+              destroy($3,$5); } 
+          ;
 
     stmt: vardecl    { $$ = $1; }
         | return     { $$ = $1; }
@@ -75,9 +91,6 @@
         | expr ';'   { $$ = $1; destroy($2); }
         ;
 
-    stmts: stmts stmt     { $$ = $1->adopt($2); }
-         | stmt           { $$ = $1; }
-         ;
 
     vardecl: identdecl '=' expr ';' {destroy($4); 
                                      $$ = $2->adopt_sym($1,TOK_VARDECL);
@@ -98,29 +111,43 @@
            | TOK_IF '(' expr ')' stmt %prec TOK_ELSE 
                     { destroy($2,$4); $$ = $1->adopt($3,$5); }
     ;
-    block :'{'stmts '}'{destroy($3); $$ = $1->adopt_sym($2,TOK_BLOCK);}
+  /*  block :'{'stmt '}'{destroy($3); $$ = $1->adopt_sym($2,TOK_BLOCK);}
           |'{' '}'     {destroy($2);  $$ = $1->change_sym(TOK_BLOCK);}
-          ;
-    expr: expr TOK_EQ expr   { $$ = $2->adopt($1, $3);}
-        | expr TOK_NE expr   { $$ = $2->adopt($1, $3);}
-        | expr TOK_LT expr   { $$ = $2->adopt($1, $3);}
-        | expr TOK_LE expr   { $$ = $2->adopt($1, $3);}
-        | expr TOK_GT expr   { $$ = $2->adopt($1, $3);}
-        | expr TOK_GE expr   { $$ = $2->adopt($1, $3);}
-        | expr '+' expr      { $$ = $2->adopt($1, $3);}
-        | expr '-' expr      { $$ = $2->adopt($1, $3);}
-        | expr '*' expr      { $$ = $2->adopt($1, $3);}
-        | expr '/' expr      { $$ = $2->adopt($1, $3);}
-        | expr '%' expr      { $$ = $2->adopt($1, $3);}
-        | expr '=' expr      { $$ = $2->adopt($1, $3);}
-        | '!' expr           { $$ = $1->adopt($2);}
-        | '+' expr %prec POS { $$ = $1->adopt_sym($2, POS);}
-        | '-' expr %prec NEG { $$ = $1->adopt_sym($2, NEG);}
-        | allocator          { $$ = $1; }
-        | call               { $$ = $1; }
-        | '(' expr ')'       {destroy($1,$3);$$ = $2;}
-        | variable           { $$ = $1; }
-        | constant           { $$ = $1; }
+          ;*/
+      block : bargs '}' { 
+          $$ = $1;
+          destroy($2); } 
+      | '{''}' { 
+          $$ = $1->adopt_sym(nullptr,TOK_BLOCK);
+          destroy($2); }
+      ;
+
+bargs : '{' stmt   { $$ = $1-> adopt_sym($2,TOK_BLOCK); }
+      | bargs stmt { $$ = $1-> adopt($2); }   
+      ;
+    expr: expr '=' expr          { $$ = $2->adopt($1, $3); }
+        | expr '+' expr          { $$ = $2->adopt($1, $3); }
+        | expr '-' expr          { $$ = $2->adopt($1, $3); }
+        | expr '*' expr          { $$ = $2->adopt($1, $3); }
+        | expr '/' expr          { $$ = $2->adopt($1, $3); }
+        | expr '%' expr          { $$ = $2->adopt($1, $3); }
+        | expr TOK_EQ expr       { $$ = $2->adopt($1, $3); }
+        | expr TOK_NE expr       { $$ = $2->adopt($1, $3); }
+        | expr TOK_LE expr       { $$ = $2->adopt($1, $3); }
+        | expr TOK_GE expr       { $$ = $2->adopt($1, $3); }
+        | expr '<' expr          { $$ = $2->adopt_sym($1,TOK_LT); 
+                                   $2->adopt($3); }
+        | expr '>' expr          { $$ = $2->adopt_sym($1,TOK_GT); 
+                                   $2->adopt($3); }
+        | '-' expr %prec NEG { $$ = $1->adopt($2); }
+        | '+' expr %prec POS  { $$ = $1->adopt($2); }
+        | TOK_NOT expr           { $$ = $1->adopt($2); }
+        | allocator              { $$ = $1; }
+        | '(' expr ')'           { $$ = $2; 
+                                   destroy ($1,$3);}
+        | call                   { $$ = $1; }
+        | variable               { $$ = $1; }
+        | constant               { $$ = $1; }
         ;
     exprs: exprs ',' expr    { $$ = $1->adopt($3); destroy($2);}
          | expr              { $$ = $1;}
@@ -157,18 +184,18 @@
                 $$ = $1->adopt($2); }
               ;
 
-    identdecls: identdecls ';' identdecl   
+   /* identdecls: identdecls ';' identdecl   
                               {destroy($2); $$ = $1->adopt($3);}
               | identdecl     {$$ = $1;}
-              ;
+              ;*/
 
-    function: identdecl '(' identdecls ')' block  { destroy($4);
+    /*function: identdecl '(' identdecls ')' block  { destroy($4);
                 $2->change_sym(TOK_PARAM);
                 $2->adopt($3);
                 astree* func = new astree(TOK_FUNCTION,$1->lloc,"");
                 $$ = func->adopt($1,$2,$5);}
             | identdecl '(' identdecls ')' ';'    { destroy($4,$5);
-                $2->change_sym(TOK_PARAM);
+                $2->change_sym(TOK_PROTOTYPE);
                 $2->adopt($3);
                 astree* func = new astree(TOK_FUNCTION,$1->lloc,"");
                 $$ = func->adopt($1,$2);}
@@ -179,10 +206,55 @@
                 $$ = $$->adopt($1,$2,$4);}
 
             | identdecl '(' ')' ';'               { destroy($3,$4);
-                $2->change_sym(TOK_PARAM);
+                $2->change_sym(TOK_PROTOTYPE);
                 astree* func = new astree(TOK_FUNCTION,$1->lloc,"");
                 $$ = func->adopt($1,$2);}
-            ;
+            ;*/
+
+    function : type TOK_IDENT params ')' block { 
+                 destroy($4);
+                 astree* func = new astree(TOK_FUNCTION, $1->lloc,"");
+                 astree* id = new astree(TOK_TYPE_ID, $1->lloc,"");
+                 id->adopt($1,$2);
+                 $$ = func->adopt(id,$3,$5);
+                 }
+             | type TOK_IDENT '(' ')' block { 
+                 destroy($4);
+                 $3->change_sym(TOK_PARAM);
+                 astree* func = new astree(TOK_FUNCTION, $1->lloc,"");
+                 astree* id = new astree(TOK_TYPE_ID, $1->lloc,"");
+                 id->adopt($1,$2);
+                 $$ = func->adopt (id,$3,$5);
+                 }
+            | type TOK_IDENT params ')' ';' { 
+                 destroy($4,$5);
+                 astree* func = new astree(TOK_FUNCTION, $1->lloc,"");
+                 astree* id = new astree(TOK_TYPE_ID, $1->lloc,"");
+                 id->adopt($1,$2);
+                 $$ = func->adopt(id,$3);
+                 }
+             | type TOK_IDENT '(' ')' ';' { 
+                 destroy($4,$5);
+                 $3->change_sym(TOK_PARAM);
+                 astree* func = new astree(TOK_FUNCTION, $1->lloc,"");
+                 astree* id = new astree(TOK_TYPE_ID, $1->lloc,"");
+                 id->adopt($1,$2);
+                 $$ = func->adopt (id,$3);
+                 }
+              ;
+
+    params : '(' type TOK_IDENT {
+               astree* id = new astree(TOK_TYPE_ID, $2->lloc,"");
+               id->adopt($2,$3);
+               $$ = $1->adopt_sym(id,TOK_PARAM); }
+           | params ',' type TOK_IDENT {
+               destroy($2); 
+               astree* id = new astree(TOK_TYPE_ID, $3->lloc,"");
+               id->adopt($3,$4);
+               $$ = $1->adopt(id); 
+               }
+           ;  
+
 
     call    : TOK_IDENT '(' exprs ')'   
                 { destroy($4); $2->change_sym(TOK_CALL);
@@ -194,7 +266,7 @@
     variable: TOK_IDENT        { $$ = $1; }
             | expr '[' expr ']'{ destroy($4); $2->change_sym(TOK_INDEX);
                                             $$ = $2->adopt($1,$3); }
-            | expr  "->"  TOK_IDENT   { $3->change_sym(TOK_FIELD);
+            | expr  TOK_ARROW  TOK_IDENT   { 
                                       $$ = $2->adopt($1,$3); }
     ;
 

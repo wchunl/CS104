@@ -22,6 +22,8 @@
 
 LETTER          [A-Za-z_]
 DIGIT           [0-9]
+NUMBER          ({MANTISSA}{EXPONENT}?)
+NOTNUMBER       ({MANTISSA}[Ee][+-]?)
 MANTISSA        ({DIGIT}+\.?{DIGIT}*|\.{DIGIT}+)
 EXPONENT        ([Ee][+-]?{DIGIT}+)
 CHAR            ('([^\\'\n]|\\[\\'"0nt])')
@@ -39,15 +41,27 @@ IIDENT          ({DIGIT}({LETTER}|{DIGIT})*)
 [ \t]+          { }
 \n              { lexer::newline(); }
 
-"="             { return lexer::token ('='); }
-"+"             { return lexer::token ('+'); }
-"-"             { return lexer::token ('-'); }
-"*"             { return lexer::token ('*'); }
-"/"             { return lexer::token ('/'); }
-"^"             { return lexer::token ('^'); }
-"("             { return lexer::token ('('); }
-")"             { return lexer::token (')'); }
-";"             { return lexer::token (';'); }
+"=="            {  return lexer::token(TOK_EQ);    }
+"!="            {  return lexer::token(TOK_NE);    }
+"<="            {  return lexer::token(TOK_LE);    }
+">="            {  return lexer::token(TOK_GE);    }
+"->"            {  return lexer::token(TOK_ARROW); }
+"+"             {  return lexer::token('+');       }
+"-"             {  return lexer::token('-');       }
+"*"             {  return lexer::token('*');       }
+"/"             {  return lexer::token('/');       }
+"%"             {  return lexer::token('%');       }
+"="             {  return lexer::token('=');       }
+"<"             {  return lexer::token('<');       }
+">"             {  return lexer::token('>');       }
+","             {  return lexer::token(',');       }
+";"             {  return lexer::token(';');       }
+"("             {  return lexer::token('(');       }
+")"             {  return lexer::token(')');       }
+"["             {  return lexer::token('[');       }
+"]"             {  return lexer::token(']');       }
+"{"             {  return lexer::token('{');       }
+"}"             {  return lexer::token('}');       }
 "if"            { return lexer::token(TOK_IF);}
 "else"          { return lexer::token(TOK_ELSE);}
 "while"         { return lexer::token(TOK_WHILE);} 
@@ -61,25 +75,13 @@ IIDENT          ({DIGIT}({LETTER}|{DIGIT})*)
 "array"         { return lexer::token(TOK_ARRAY); }
 "ptr"           { return lexer::token(TOK_PTR); }
 "void"          { return lexer::token(TOK_VOID); }
-"=="            { return lexer::token(TOK_EQ); }
-"!="            { return lexer::token(TOK_NE); }
-"<"             { return lexer::token(TOK_LT); }
-"<="            { return lexer::token(TOK_LE); }
-">"             { return lexer::token(TOK_GT); }
-">="            { return lexer::token(TOK_GE); }
-"["             { return lexer::token('['); }
-"]"             { return lexer::token(']'); }
-"{"             { return lexer::token('{'); }
-"}"             { return lexer::token('}'); }
-","             { return lexer::token(','); }
-"."             { return lexer::token('.'); }
-"%"             { return lexer::token('%'); }
-"!"             { return lexer::token('!'); }
-{INT}           { return lexer::token(TOK_INTCON); }
+
+{NUMBER}           { return lexer::token(TOK_INTCON); }
 {IDENT}         { return lexer::token( TOK_IDENT ); }
 {STRING}        { return lexer::token(TOK_STRINGCON);}
 {CHAR}          { return lexer::token(TOK_CHARCON);}
 {IIDENT}        { return lexer::badtoken(*yytext);}
+{NOTNUMBER}     { return lexer::badtoken (TOK_INTCON); }
 .               { lexer::badchar (*yytext); }
 
 %%
