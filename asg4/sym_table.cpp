@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "sym_table.h"
 #include "astree.h"
 #include "lyutils.h"
@@ -41,3 +40,4 @@ void traverse(FILE* outfile, astree* root, int depth) {
    //          root->lloc.filenr, root->lloc.linenr, root->lloc.offset);
 
 }
+
