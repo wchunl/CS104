@@ -32,7 +32,6 @@ struct symbol {
     size_t block_nr;
     vector<symbol*>* parameters;
 };
-void traverse(astree* root);
-// const string to_string (attr attribute);
+void traverse(FILE* outfile, astree* tree, int depth = 0);
 
 #endif

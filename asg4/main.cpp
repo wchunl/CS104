@@ -103,6 +103,7 @@ int main (int argc, char** argv) {
     string str_out_name = basename + ".str";
     string tok_out_name = basename + ".tok";
     string ast_out_name = basename + ".ast";
+    string sym_out_name = basename + ".sym";
 
     // Open token file for streaming
     tok_out = fopen(tok_out_name.c_str(),"w");
@@ -115,12 +116,16 @@ int main (int argc, char** argv) {
     fclose(tok_out);
     cpp_pclose();
 
-    traverse(parser::root);
+    // Dump symbol tree into sym file
+    FILE* sym_out = fopen(sym_out_name.c_str(),"w");
+    traverse(sym_out, parser::root);
+    int fclose_rc = fclose(sym_out);
+    if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
     // Dump stringset into str file
     FILE* str_out = fopen(str_out_name.c_str(),"w");
     string_set::dump(str_out);
-    int fclose_rc = fclose(str_out);
+    fclose_rc = fclose(str_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
     // Dump tree into ast file
