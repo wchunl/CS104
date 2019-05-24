@@ -102,8 +102,7 @@ block       : '{' block_rec '}' {
             | '{''}' {
                 $$ = $1->adopt_sym(nullptr,TOK_BLOCK); destroy($2); }
 
-block_rec   : stmt { astree* t = new astree(TOK_FUNCTION, $1->lloc,"");
-                          $$ = t->adopt($1);}
+block_rec   : stmt {$$ = $$ = $1;}
             | block_rec stmt { $$ = $1->adopt($2);}
 
 expr        : expr '=' expr         { $$ = $2->adopt($1, $3); }
