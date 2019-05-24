@@ -33,5 +33,6 @@ struct symbol {
     vector<symbol*>* parameters;
 };
 void traverse(FILE* outfile, astree* tree, int depth = 0);
+// void tcheck_struct(astree* root);
 
 #endif
