@@ -1,5 +1,5 @@
-ижѕ:9.4: syntax error, unexpected '[', expecting TOK_IDENT
-ижѕ:10.11: syntax error, unexpected ']'
-ижѕ:13.14: syntax error, unexpected '[', expecting TOK_IDENT
-ижѕ:16.1: syntax error, unexpected TOK_INT, expecting ';'
-ижѕ:31.1: syntax error, unexpected '}'
+и6z:9.4: syntax error, unexpected '[', expecting TOK_IDENT
+и6z:10.11: syntax error, unexpected ']'
+и6z:13.14: syntax error, unexpected '[', expecting TOK_IDENT
+и6z:16.1: syntax error, unexpected TOK_INT, expecting ';'
+и6z:31.1: syntax error, unexpected '}'
