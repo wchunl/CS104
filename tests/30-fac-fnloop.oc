@@ -1,0 +1,26 @@
+// $Id: 30-fac-fnloop.oc,v 1.1 2019-04-16 12:14:45-07 - - $
+//
+// Function uses a loop to compute factorial.
+//
+
+#include "oclib.h"
+
+int fac (int n) {
+   int f = 1;
+   while (n > 1) {
+      f = f * n;
+      n = n - 1;
+   }
+   return f;
+}
+
+int main() {
+   int n = 1;
+   while (n <= 5) {
+      putint (fac (n));
+      putchr ('\n');
+      n = n + 1;
+   }
+   return SUCCESS;
+}
+

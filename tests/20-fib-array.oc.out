@@ -1,0 +1,46 @@
+; 0.  1: # 1 "20-fib-array.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "20-fib-array.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: 
+; 4.  4: 
+; 4.  5: 
+; 4.  6: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 7 "20-fib-array.oc" 2
+; 7.  7: 
+; 7.  8: 
+; 7.  9: 
+; 7. 10: int main() {
+; 7. 11:    array<int> fibonacci = alloc<array<int>> (30);
+; 7. 12:    fibonacci[0] = 0;
+; 7. 13:    fibonacci[1] = 1;
+; 7. 14:    int index = 2;
+; 7. 15:    while (index < 30) {
+; 7. 16:       fibonacci[index] = fibonacci[index - 1] + fibonacci[index - 2];
+; 7. 17:       index = index + 1;
+; 7. 18:    }
+; 7. 19:    index = 0;
+; 7. 20:    putstr ("Numeri di figlio Bonacci\n");
+; 7. 21:    while (index < 30) {
+; 7. 22:       putstr ("fibonacci[");
+; 7. 23:       putint (index);
+; 7. 24:       putstr ("] = ");
+; 7. 25:       putint (fibonacci[index]);
+; 7. 26:       putchr ('\n');
+; 7. 27:       index = index + 1;
+; 7. 28:    }
+; 7. 29:    return 0;
+; 7. 30: }
+hello

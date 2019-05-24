@@ -1,0 +1,41 @@
+; 0.  1: # 1 "30-fac-fnloop.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "30-fac-fnloop.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: 
+; 4.  4: 
+; 4.  5: 
+; 4.  6: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 7 "30-fac-fnloop.oc" 2
+; 7.  7: 
+; 7.  8: int fac (int n) {
+; 7.  9:    int f = 1;
+; 7. 10:    while (n > 1) {
+; 7. 11:       f = f * n;
+; 7. 12:       n = n - 1;
+; 7. 13:    }
+; 7. 14:    return f;
+; 7. 15: }
+; 7. 16: 
+; 7. 17: int main() {
+; 7. 18:    int n = 1;
+; 7. 19:    while (n <= 5) {
+; 7. 20:       putint (fac (n));
+; 7. 21:       putchr ('\n');
+; 7. 22:       n = n + 1;
+; 7. 23:    }
+; 7. 24:    return 0;
+; 7. 25: }
+hello

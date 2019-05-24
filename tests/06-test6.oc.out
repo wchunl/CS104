@@ -1,0 +1,34 @@
+; 0.  1: # 1 "06-test6.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "06-test6.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 4 "06-test6.oc" 2
+; 7.  4: 
+; 7.  5: struct foo {};
+; 7.  6: struct bar {};
+; 7.  7: 
+; 7.  8: int f0();
+; 7.  9: int f1 (int a);
+; 7. 10: int f2 (int a, int b);
+; 7. 11: int f3 (string a, string b, string c);
+; 7. 12: int f4 (ptr<struct foo> a, ptr<struct bar> b);
+; 7. 13: 
+; 7. 14: int main() {
+; 7. 15:    string s = "a";
+; 7. 16:    array<string> sa = alloc<array<string>>(10);
+; 7. 17:    return 0;
+; 7. 18: }
+hello

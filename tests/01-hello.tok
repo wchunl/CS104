@@ -1,0 +1,70 @@
+#  1 "01-hello.oc"
+#  1 "<built-in>"
+#  1 "<command-line>"
+#  1 "01-hello.oc"
+#  1 "oclib.h"
+# 22 "oclib.h"
+   6 22.00001 261 TOK_VOID      void
+   6 22.00006 282 TOK_IDENT     fail
+   6 22.00011  40 '('           (
+   6 22.00012 263 TOK_STRING    string
+   6 22.00019 282 TOK_IDENT     expr
+   6 22.00023  44 ','           ,
+   6 22.00025 263 TOK_STRING    string
+   6 22.00032 282 TOK_IDENT     file
+   6 22.00036  44 ','           ,
+   6 22.00038 262 TOK_INT       int
+   6 22.00042 282 TOK_IDENT     line
+   6 22.00046  41 ')'           )
+   6 22.00047  59 ';'           ;
+   6 24.00001 261 TOK_VOID      void
+   6 24.00006 282 TOK_IDENT     putchr
+   6 24.00013  40 '('           (
+   6 24.00014 262 TOK_INT       int
+   6 24.00018 282 TOK_IDENT     chr
+   6 24.00021  41 ')'           )
+   6 24.00022  59 ';'           ;
+   6 25.00001 261 TOK_VOID      void
+   6 25.00006 282 TOK_IDENT     putint
+   6 25.00013  40 '('           (
+   6 25.00014 262 TOK_INT       int
+   6 25.00018 282 TOK_IDENT     num
+   6 25.00021  41 ')'           )
+   6 25.00022  59 ';'           ;
+   6 26.00001 261 TOK_VOID      void
+   6 26.00006 282 TOK_IDENT     putstr
+   6 26.00013  40 '('           (
+   6 26.00014 263 TOK_STRING    string
+   6 26.00021 282 TOK_IDENT     str
+   6 26.00024  41 ')'           )
+   6 26.00025  59 ';'           ;
+   6 28.00001 262 TOK_INT       int
+   6 28.00005 282 TOK_IDENT     getchr
+   6 28.00011  40 '('           (
+   6 28.00012  41 ')'           )
+   6 28.00013  59 ';'           ;
+   6 29.00001 263 TOK_STRING    string
+   6 29.00008 282 TOK_IDENT     getstr
+   6 29.00014  40 '('           (
+   6 29.00015  41 ')'           )
+   6 29.00016  59 ';'           ;
+   6 30.00001 263 TOK_STRING    string
+   6 30.00008 282 TOK_IDENT     getln
+   6 30.00013  40 '('           (
+   6 30.00014  41 ')'           )
+   6 30.00015  59 ';'           ;
+#  5 "01-hello.oc"
+   7 6.00001 262 TOK_INT       int
+   7 6.00005 282 TOK_IDENT     main
+   7 6.00009  40 '('           (
+   7 6.00010  41 ')'           )
+   7 6.00012 123 '{'           {
+   7 7.00004 282 TOK_IDENT     putstr
+   7 7.00011  40 '('           (
+   7 7.00012 285 TOK_STRINGCON "Hello, world!\n"
+   7 7.00029  41 ')'           )
+   7 7.00030  59 ';'           ;
+   7 8.00004 268 TOK_RETURN    return
+   7 8.00011 283 TOK_INTCON    0
+   7 8.00012  59 ';'           ;
+   7 9.00001 125 '}'           }

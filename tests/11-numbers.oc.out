@@ -1,0 +1,31 @@
+; 0.  1: # 1 "11-numbers.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "11-numbers.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 4 "11-numbers.oc" 2
+; 7.  4: 
+; 7.  5: int main() {
+; 7.  6:    int number = 1;
+; 7.  7:    int done = 0;
+; 7.  8:    while (not done) {
+; 7.  9:       putint (number);
+; 7. 10:       putchr ('\n');
+; 7. 11:       if (number <= 0) done = 1;
+; 7. 12:       number = number + number;
+; 7. 13:    }
+; 7. 14:    return 0;
+; 7. 15: }
+hello

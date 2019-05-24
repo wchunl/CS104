@@ -1,0 +1,69 @@
+; 0.  1: # 1 "41-linkedstack.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "41-linkedstack.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 4 "41-linkedstack.oc" 2
+; 7.  4: 
+; 7.  5: struct node {
+; 7.  6:    string data;
+; 7.  7:    ptr <struct node> link;
+; 7.  8: };
+; 7.  9: 
+; 7. 10: struct stack {
+; 7. 11:    ptr <struct node> top;
+; 7. 12: };
+; 7. 13: 
+; 7. 14: int empty (ptr<struct stack> stack) {
+; 7. 15:    {if (not (stack != nullptr)) fail ("stack != nullptr", "41-linkedstack.oc", 15);};
+; 7. 16:    return stack->top == nullptr;
+; 7. 17: }
+; 7. 18: 
+; 7. 19: ptr<struct stack> new_stack() {
+; 7. 20:    ptr<struct stack> stack = alloc<struct stack>();
+; 7. 21:    stack->top = nullptr;
+; 7. 22:    return stack;
+; 7. 23: }
+; 7. 24: 
+; 7. 25: void push (ptr<struct stack> stack, string str) {
+; 7. 26:    ptr <struct node> tmp = alloc<struct node>();
+; 7. 27:    {if (not (stack != nullptr)) fail ("stack != nullptr", "41-linkedstack.oc", 27);};
+; 7. 28:    tmp->data = str;
+; 7. 29:    tmp->link = stack->top;
+; 7. 30:    stack->top = tmp;
+; 7. 31: }
+; 7. 32: 
+; 7. 33: string pop (ptr<struct stack> stack) {
+; 7. 34:    string tmp = stack->top->data;
+; 7. 35:    {if (not (stack != nullptr)) fail ("stack != nullptr", "41-linkedstack.oc", 35);};
+; 7. 36:    {if (not (not empty (stack))) fail ("not empty (stack)", "41-linkedstack.oc", 36);};
+; 7. 37:    stack->top = stack->top->link;
+; 7. 38:    return tmp;
+; 7. 39: }
+; 7. 40: 
+; 7. 41: int main (int argc, array<string> argv) {
+; 7. 42:    int argi = 0;
+; 7. 43:    ptr<struct stack> stack = new_stack();
+; 7. 44:    while (argi < argc) {
+; 7. 45:       push (stack, argv[argi]);
+; 7. 46:       argi = argi + 1;
+; 7. 47:    }
+; 7. 48:    while (not empty (stack)) {
+; 7. 49:       putstr (pop (stack));
+; 7. 50:       putchr ('\n');
+; 7. 51:    }
+; 7. 52:    return 0;
+; 7. 53: }
+hello

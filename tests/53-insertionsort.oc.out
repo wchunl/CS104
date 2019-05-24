@@ -1,0 +1,95 @@
+; 0.  1: # 1 "53-insertionsort.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "53-insertionsort.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: 
+; 4.  4: 
+; 4.  5: 
+; 4.  6: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 7 "53-insertionsort.oc" 2
+; 7.  7: 
+; 7.  8: int strcmp (string s1, string s2) {
+; 7.  9:    int index = 0;
+; 7. 10:    int contin = 1;
+; 7. 11:    int s1c = 0;
+; 7. 12:    int s2c = 0;
+; 7. 13:    int cmp = 0;
+; 7. 14:    while (contin) {
+; 7. 15:       s1c = s1[index];
+; 7. 16:       s2c = s2[index];
+; 7. 17:       cmp = s1c - s2c;
+; 7. 18:       if (cmp != 0) return cmp;
+; 7. 19:       if (s1c == '\0') contin = 0;
+; 7. 20:       if (s2c == '\0') contin = 0;
+; 7. 21:       index = index + 1;
+; 7. 22:    }
+; 7. 23:    return 0;
+; 7. 24: }
+; 7. 25: 
+; 7. 26: void insertion_sort (int size, array<string> words) {
+; 7. 27:    int sorted = 1;
+; 7. 28:    int slot = 0;
+; 7. 29:    string element = nullptr;
+; 7. 30:    int contin = 0;
+; 7. 31:    while (sorted < size) {
+; 7. 32:       slot = sorted;
+; 7. 33:       element = words[slot];
+; 7. 34:       contin = 1;
+; 7. 35:       while (contin) {
+; 7. 36:          if (slot == 0) {
+; 7. 37:             contin = 0;
+; 7. 38:          }else if (strcmp (words[slot - 1], element) <= 0) {
+; 7. 39:             contin = 0;
+; 7. 40:          }else {
+; 7. 41:             words[slot] = words[slot - 1];
+; 7. 42:             slot = slot - 1;
+; 7. 43:          }
+; 7. 44:       }
+; 7. 45:       words[slot] = element;
+; 7. 46:       sorted = sorted + 1;
+; 7. 47:    }
+; 7. 48: }
+; 7. 49: 
+; 7. 50: 
+; 7. 51: void print_array (int size, array<string> words) {
+; 7. 52:    int index = 0;
+; 7. 53:    while (index < size) {
+; 7. 54:       putstr (words[index]);
+; 7. 55:       putchr ('\n');
+; 7. 56:       index = index + 1;
+; 7. 57:    }
+; 7. 58: }
+; 7. 59: 
+; 7. 60: int read_words (int size, array<string> words) {
+; 7. 61:    int count = 0;
+; 7. 62:    string word = nullptr;
+; 7. 63:    while (1) {
+; 7. 64:       if (count == size) return count;
+; 7. 65:       word = getstr();
+; 7. 66:       if (word == nullptr) return count;
+; 7. 67:       words[count] = word;
+; 7. 68:       count = count + 1;
+; 7. 69:    }
+; 7. 70: }
+; 7. 71: 
+; 7. 72: int main() {
+; 7. 73:    int count = 100;
+; 7. 74:    array<string> words = alloc<array<string>>(count);
+; 7. 75:    count = read_words (count, words);
+; 7. 76:    insertion_sort (count, words);
+; 7. 77:    print_array (count, words);
+; 7. 78:    return 0;
+; 7. 79: }
+hello

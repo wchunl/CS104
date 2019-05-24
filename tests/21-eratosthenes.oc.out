@@ -1,0 +1,55 @@
+; 0.  1: # 1 "21-eratosthenes.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "21-eratosthenes.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 4 "21-eratosthenes.oc" 2
+; 7.  4: 
+; 7.  5: 
+; 7.  6: 
+; 7.  7: 
+; 7.  8: int main() {
+; 7.  9:    int prime = 2;
+; 7. 10:    int index = 2;
+; 7. 11:    array<int> sieve = alloc<array<int>>(100);
+; 7. 12: 
+; 7. 13:    while (index < 100) {
+; 7. 14:       sieve[index] = 1;
+; 7. 15:       index = index + 1;
+; 7. 16:    }
+; 7. 17: 
+; 7. 18:    while (prime < 100) {
+; 7. 19:       if (sieve[prime]) {
+; 7. 20:          index = prime * 2;
+; 7. 21:          while (index < 100) {
+; 7. 22:             sieve[index] = 0;
+; 7. 23:             index = index + prime;
+; 7. 24:          }
+; 7. 25:       }
+; 7. 26:       prime = prime + 1;
+; 7. 27:    }
+; 7. 28: 
+; 7. 29:    index = 2;
+; 7. 30:    while (index < 100) {
+; 7. 31:       if (sieve[index]) {
+; 7. 32:          putint (index);
+; 7. 33:          putchr ('\n');
+; 7. 34:       }
+; 7. 35:       index = index + 1;
+; 7. 36:    }
+; 7. 37: 
+; 7. 38:    return 0;
+; 7. 39: }
+hello

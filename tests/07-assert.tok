@@ -1,0 +1,86 @@
+#  1 "07-assert.oc"
+#  1 "<built-in>"
+#  1 "<command-line>"
+#  1 "07-assert.oc"
+#  1 "oclib.h"
+# 22 "oclib.h"
+   6 22.00001 261 TOK_VOID      void
+   6 22.00006 282 TOK_IDENT     fail
+   6 22.00011  40 '('           (
+   6 22.00012 263 TOK_STRING    string
+   6 22.00019 282 TOK_IDENT     expr
+   6 22.00023  44 ','           ,
+   6 22.00025 263 TOK_STRING    string
+   6 22.00032 282 TOK_IDENT     file
+   6 22.00036  44 ','           ,
+   6 22.00038 262 TOK_INT       int
+   6 22.00042 282 TOK_IDENT     line
+   6 22.00046  41 ')'           )
+   6 22.00047  59 ';'           ;
+   6 24.00001 261 TOK_VOID      void
+   6 24.00006 282 TOK_IDENT     putchr
+   6 24.00013  40 '('           (
+   6 24.00014 262 TOK_INT       int
+   6 24.00018 282 TOK_IDENT     chr
+   6 24.00021  41 ')'           )
+   6 24.00022  59 ';'           ;
+   6 25.00001 261 TOK_VOID      void
+   6 25.00006 282 TOK_IDENT     putint
+   6 25.00013  40 '('           (
+   6 25.00014 262 TOK_INT       int
+   6 25.00018 282 TOK_IDENT     num
+   6 25.00021  41 ')'           )
+   6 25.00022  59 ';'           ;
+   6 26.00001 261 TOK_VOID      void
+   6 26.00006 282 TOK_IDENT     putstr
+   6 26.00013  40 '('           (
+   6 26.00014 263 TOK_STRING    string
+   6 26.00021 282 TOK_IDENT     str
+   6 26.00024  41 ')'           )
+   6 26.00025  59 ';'           ;
+   6 28.00001 262 TOK_INT       int
+   6 28.00005 282 TOK_IDENT     getchr
+   6 28.00011  40 '('           (
+   6 28.00012  41 ')'           )
+   6 28.00013  59 ';'           ;
+   6 29.00001 263 TOK_STRING    string
+   6 29.00008 282 TOK_IDENT     getstr
+   6 29.00014  40 '('           (
+   6 29.00015  41 ')'           )
+   6 29.00016  59 ';'           ;
+   6 30.00001 263 TOK_STRING    string
+   6 30.00008 282 TOK_IDENT     getln
+   6 30.00013  40 '('           (
+   6 30.00014  41 ')'           )
+   6 30.00015  59 ';'           ;
+#  4 "07-assert.oc"
+   7 5.00001 262 TOK_INT       int
+   7 5.00005 282 TOK_IDENT     main
+   7 5.00009  40 '('           (
+   7 5.00010  41 ')'           )
+   7 5.00012 123 '{'           {
+   7 6.00004 123 '{'           {
+   7 6.00005 265 TOK_IF        if
+   7 6.00008  40 '('           (
+   7 6.00009 281 TOK_NOT       not
+   7 6.00013  40 '('           (
+   7 6.00014 285 TOK_STRINGCON "nullptr"
+   7 6.00024 275 TOK_EQ        ==
+   7 6.00027 270 TOK_NULLPTR   nullptr
+   7 6.00034  41 ')'           )
+   7 6.00035  41 ')'           )
+   7 6.00037 282 TOK_IDENT     fail
+   7 6.00042  40 '('           (
+   7 6.00043 285 TOK_STRINGCON "\"nullptr\" == nullptr"
+   7 6.00067  44 ','           ,
+   7 6.00069 285 TOK_STRINGCON "07-assert.oc"
+   7 6.00083  44 ','           ,
+   7 6.00085 283 TOK_INTCON    6
+   7 6.00086  41 ')'           )
+   7 6.00087  59 ';'           ;
+   7 6.00088 125 '}'           }
+   7 6.00089  59 ';'           ;
+   7 7.00004 268 TOK_RETURN    return
+   7 7.00011 283 TOK_INTCON    1
+   7 7.00012  59 ';'           ;
+   7 8.00001 125 '}'           }

@@ -1,0 +1,30 @@
+; 0.  1: # 1 "14-ocecho.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "14-ocecho.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 4 "14-ocecho.oc" 2
+; 7.  4: 
+; 7.  5: int main(int argc, array<string> argv) {
+; 7.  6:    int argi = 1;
+; 7.  7:    while (argi < argc) {
+; 7.  8:       if (argi > 1) putchr (' ');
+; 7.  9:       putstr (argv[argi]);
+; 7. 10:       argi = argi + 1;
+; 7. 11:    }
+; 7. 12:    putstr ("\n");
+; 7. 13:    return 0;
+; 7. 14: }
+hello

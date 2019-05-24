@@ -1,0 +1,33 @@
+; 0.  1: # 1 "13-macros.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "13-macros.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 4 "13-macros.oc" 2
+; 7.  4: 
+; 7.  5: int main (int argc, array<string> argv) {
+; 7.  6:    putstr (argv[0]);
+; 7.  7:    putstr (": ");
+; 7.  8:    putstr ("13-macros.oc");
+; 7.  9:    putchr ('[');
+; 7. 10:    putint (10);
+; 7. 11:    putstr ("] compiled ");
+; 7. 12:    putstr ("May 13 2019");
+; 7. 13:    putstr (" ");
+; 7. 14:    putstr ("14:51:29");
+; 7. 15:    putstr ("\n");
+; 7. 16:    return 0;
+; 7. 17: }
+hello

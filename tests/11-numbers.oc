@@ -1,0 +1,16 @@
+// $Id: 11-numbers.oc,v 1.2 2019-04-18 14:06:21-07 - - $
+
+#include "oclib.h"
+
+int main() {
+   int number = 1;
+   BOOL done = FALSE;
+   while (not done) {
+      putint (number);
+      putchr ('\n');
+      if (number <= 0) done = TRUE;
+      number = number + number;
+   }
+   return SUCCESS;
+}
+

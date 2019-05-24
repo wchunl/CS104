@@ -1,0 +1,17 @@
+; 0.  1: # 1 "96-unterminated.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "96-unterminated.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: 
+; 4.  4: int main() {
+; 4.  5:    string t = "\*/";
+; 4.  6:    string s = "abc;
+; 4.  7:    char c = 'a;
+; 4.  8:    s = "abcd\";
+; 4.  9:    s = "abc|   ;
+; 4. 10: 
+; 4. 11:    int 23foobar;
+; 4. 12: }
+hello

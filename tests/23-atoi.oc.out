@@ -1,0 +1,60 @@
+; 0.  1: # 1 "23-atoi.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "23-atoi.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 4 "23-atoi.oc" 2
+; 7.  4: 
+; 7.  5: int atoi (string str) {
+; 7.  6:    int neg = 0;
+; 7.  7:    int num = 0;
+; 7.  8:    int digit = 0;
+; 7.  9:    {if (not (str != nullptr)) fail ("str != nullptr", "23-atoi.oc", 9);};
+; 7. 10:    if (str[0] != '\0') {
+; 7. 11:       if (str[0] == '-') {
+; 7. 12:          digit = digit + 1;
+; 7. 13:          neg = 1;
+; 7. 14:       }
+; 7. 15:       int contin = 1;
+; 7. 16:       while (contin) {
+; 7. 17:          if (str[digit] == '\0') {
+; 7. 18:             contin = 0;
+; 7. 19:          }else {
+; 7. 20:             int chr = str[digit];
+; 7. 21:             digit = digit + 1;
+; 7. 22:             if (chr < '0') contin = 0;
+; 7. 23:             else if (chr > '9') contin = 0;
+; 7. 24:             else num = num * 10 + chr - '0';
+; 7. 25:          }
+; 7. 26:       }
+; 7. 27:       if (neg) num = - num;
+; 7. 28:    }
+; 7. 29:    return num;
+; 7. 30: }
+; 7. 31: 
+; 7. 32: int main (int argc, array<string> argv) {
+; 7. 33:    int argi = 1;
+; 7. 34:    string arg = nullptr;
+; 7. 35:    while (argi < argc) {
+; 7. 36:       arg = argv[argi];
+; 7. 37:       putstr (arg);
+; 7. 38:       putstr (" = ");
+; 7. 39:       putint (atoi (arg));
+; 7. 40:       putchr ('\n');
+; 7. 41:       argi = argi + 1;
+; 7. 42:    }
+; 7. 43:    return 0;
+; 7. 44: }
+hello

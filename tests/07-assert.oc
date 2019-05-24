@@ -1,0 +1,9 @@
+// $Id: 07-assert.oc,v 1.2 2019-04-16 13:14:01-07 - - $
+
+#include "oclib.h"
+
+int main() {
+   assert ("nullptr" == nullptr);
+   return FAILURE;
+}
+

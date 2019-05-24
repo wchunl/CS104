@@ -1,0 +1,48 @@
+; 0.  1: # 1 "33-collatz.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "33-collatz.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: 
+; 4.  4: 
+; 4.  5: 
+; 4.  6: 
+; 4.  7: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 8 "33-collatz.oc" 2
+; 7.  8: 
+; 7.  9: int collatz (int n) {
+; 7. 10:    int c = 0;
+; 7. 11:    while (n != 1) {
+; 7. 12:       c = c + 1;
+; 7. 13:       if (n % 2 == 1) n = 3 * n + 1;
+; 7. 14:                  else n = n / 2;
+; 7. 15:    }
+; 7. 16:    return c;
+; 7. 17: }
+; 7. 18: 
+; 7. 19: void test (int n) {
+; 7. 20:    int c = collatz (n);
+; 7. 21:    putstr ("collatz(");
+; 7. 22:    putint (n);
+; 7. 23:    putstr (") = ");
+; 7. 24:    putint (c);
+; 7. 25:    putchr ('\n');
+; 7. 26: }
+; 7. 27: 
+; 7. 28: int main() {
+; 7. 29:    test (3);
+; 7. 30:    test (50);
+; 7. 31:    return 0;
+; 7. 32: }
+hello

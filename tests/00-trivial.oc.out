@@ -1,0 +1,8 @@
+; 0.  1: # 1 "00-trivial.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "00-trivial.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: int main(){}
+hello

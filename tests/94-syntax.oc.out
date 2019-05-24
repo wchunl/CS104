@@ -1,0 +1,13 @@
+; 0.  1: # 1 "94-syntax.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "94-syntax.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: int f() {
+; 4.  4: int a = ;
+; 4.  5: return foo;
+; 4.  6: public static int main (String[] args) {
+; 4.  7:    System.exit (255);
+; 4.  8: }
+hello

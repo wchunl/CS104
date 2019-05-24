@@ -1,0 +1,40 @@
+// $Id: 21-eratosthenes.oc,v 1.1 2019-04-16 12:14:45-07 - - $
+
+#include "oclib.h"
+
+#define SIZE 100
+#define LOWPRIME 2
+
+int main() {
+   int prime = LOWPRIME;
+   int index = LOWPRIME;
+   array<int> sieve = alloc<array<int>>(SIZE);
+
+   while (index < SIZE) {
+      sieve[index] = TRUE;
+      index = index + 1;
+   }
+
+   while (prime < SIZE) {
+      if (sieve[prime]) {
+         index = prime * 2;
+         while (index < SIZE) {
+            sieve[index] = FALSE;
+            index = index + prime;
+         }
+      }
+      prime = prime + 1;
+   }
+
+   index = LOWPRIME;
+   while (index < SIZE) {
+      if (sieve[index]) {
+         putint (index);
+         putchr ('\n');
+      }
+      index = index + 1;
+   }
+
+   return SUCCESS;
+}
+

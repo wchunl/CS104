@@ -1,0 +1,26 @@
+96-unterminated.oc:6:15: warning: missing terminating " character [enabled by default]
+    string s = "abc;
+               ^
+96-unterminated.oc:7:13: warning: missing terminating ' character [enabled by default]
+    char c = 'a;
+             ^
+96-unterminated.oc:8:8: warning: missing terminating " character [enabled by default]
+    s = "abcd\";
+        ^
+96-unterminated.oc:9:8: warning: missing terminating " character [enabled by default]
+    s = "abc|\
+        ^
+HW?:5.15: invalid source character (")
+HW?:5.16: invalid source character (\)
+HW?:5.17: syntax error, unexpected '*'
+HW?:5.19: invalid source character (")
+HW?:6.15: invalid source character (")
+HW?:7.9: syntax error, unexpected TOK_IDENT
+HW?:7.13: invalid source character (')
+HW?:8.8: invalid source character (")
+HW?:8.13: invalid source character (\)
+HW?:8.14: invalid source character (")
+HW?:9.8: invalid source character (")
+HW?:9.12: invalid source character (|)
+HW?:11.8: invalid token (23foobar)
+HW?:11.8: syntax error, unexpected $undefined, expecting TOK_IDENT

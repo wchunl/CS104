@@ -1,0 +1,45 @@
+; 0.  1: # 1 "44-dot-product.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "44-dot-product.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: # 1 "oclib.h" 1
+; 5.  1: # 22 "oclib.h"
+; 6. 22: void fail (string expr, string file, int line);
+; 6. 23: 
+; 6. 24: void putchr (int chr);
+; 6. 25: void putint (int num);
+; 6. 26: void putstr (string str);
+; 6. 27: 
+; 6. 28: int getchr();
+; 6. 29: string getstr();
+; 6. 30: string getln();
+; 6. 31: # 4 "44-dot-product.oc" 2
+; 7.  4: 
+; 7.  5: int dot_product (int size, array<int> vec1, array<int> vec2) {
+; 7.  6:    int index = 0;
+; 7.  7:    int dot = 0;
+; 7.  8:    while (index < size) {
+; 7.  9:       dot = dot + vec1[index] * vec2[index];
+; 7. 10:       index = index + 1;
+; 7. 11:    }
+; 7. 12:    return dot;
+; 7. 13: }
+; 7. 14: 
+; 7. 15: 
+; 7. 16: 
+; 7. 17: int main() {
+; 7. 18:    array<int> vec1 = alloc<array<int>> (10);
+; 7. 19:    array<int> vec2 = alloc<array<int>> (10);
+; 7. 20:    int index = 0;
+; 7. 21:    while (index < 10) {
+; 7. 22:       vec1[index] = index + 10;
+; 7. 23:       vec2[index] = index * 10;
+; 7. 24:       index = index + 1;
+; 7. 25:    }
+; 7. 26:    putint (dot_product (10, vec1, vec2));
+; 7. 27:    putchr ('\n');
+; 7. 28:    return 0;
+; 7. 29: }
+hello

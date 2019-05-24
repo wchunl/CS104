@@ -1,0 +1,20 @@
+; 0.  1: # 1 "93-semantics.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "93-semantics.oc"
+; 4.  1: 
+; 4.  2: 
+; 4.  3: 
+; 4.  4: int[] a = null;
+; 4.  5: int[] b = null;
+; 4.  6: 
+; 4.  7: void[] f() {};
+; 4.  8: 
+; 4.  9: int main() {
+; 4. 10:    int c = a + b;
+; 4. 11:    void n = null;
+; 4. 12:    int x = a < b;
+; 4. 13:    int y = a==b;
+; 4. 14:    return "foobar";
+; 4. 15: }
+hello
