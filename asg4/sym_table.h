@@ -33,11 +33,11 @@ struct symbol {
     vector<symbol*>* parameters;
 };
 void traverse(FILE* outfile, astree* tree, int depth = 0);
+void traverse_struct(astree* root, symbol* sym);
 void traverse_function(astree* root, symbol* sym);
 
 // Function helper functions
 void fn_read_param(astree* root, symbol* func_sym, size_t block_nr);
-
 
 void print_ident(symbol* sym, astree* type, astree* name);
 

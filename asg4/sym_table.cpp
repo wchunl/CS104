@@ -12,10 +12,10 @@ using namespace std;
 
 
 // Symbol Tables
-symbol_table struct_table;
-symbol_table struct_field_table;
-symbol_table ident_table_global;
-symbol_table ident_table_local;
+symbol_table *struct_table;
+//symbol_table struct_field_table;
+symbol_table *ident_table_global;
+symbol_table *ident_table_local;
 
 
 void traverse(FILE* outfile, astree* root, int depth) {
@@ -27,10 +27,9 @@ void traverse(FILE* outfile, astree* root, int depth) {
    // std::cout << test->attributes << "\n";
 
 
-   fprintf (outfile, "%-20s", parser::get_tname(root->symbol));
 
    switch (root->symbol) {
-      case TOK_STRUCT    :{printf("struct unimplemented\n"); break;} // case (4b)
+      case TOK_STRUCT    :{traverse_struct(root,new symbol()); break;} // case (4b)
       case TOK_FUNCTION  :{traverse_function(root, new symbol()); break;} // case (4h)
       case TOK_VARDECL   :{printf("vardecl unimplemented\n"); break;} // case (4k)
       case TOK_IDENT     :{printf("ident unimplemented\n"); break;} // case (4f)
@@ -38,7 +37,34 @@ void traverse(FILE* outfile, astree* root, int depth) {
       for (astree* child: root->children) traverse(outfile, child, depth + 1);
       break;}
    }
+
+   fprintf (outfile, "%-20s", parser::get_tname(root->symbol));
 }
+
+void traverse_struct(astree* root, symbol* struct_sym){
+   size_t seq_num = 0;
+   set_attr(struct_sym,attr::STRUCT);//remember to print struct name after this
+   string* struct_name = const_cast<string *>(root->children[0]->lexinfo);
+   struct_sym->block_nr = 0;
+   struct_sym->fields = new symbol_table();
+   for(astree* child: root->children){
+      if(child->symbol == TOK_IDENT){
+            child->struct_id = child->lexinfo;//not neccessary
+      }else{
+         symbol* field_sym = new symbol();
+         field_sym->sequence = seq_num;
+         field_sym->lloc = child->lloc;
+         set_attr(field_sym,attr::FIELD);//print type_id before this
+         struct_sym->fields->insert({const_cast<string *>(child->lexinfo),field_sym});   
+         seq_num++;
+      }
+   }
+   if (struct_name == nullptr) {
+        printf("no struct name!!!\n");
+   }else {
+      struct_table->insert({struct_name, struct_sym});
+   }   
+}  
 
 void traverse_function(astree* root, symbol* func_sym) {
    int seq_num = 0;
@@ -83,6 +109,7 @@ void set_attr(symbol* sym, attr a1) {
 }
 
 
+
 // void traverse_vardecl(astree* root, symbol* sym) {
 //    switch (root->symbol) {
 //       case TOK_INT     :{sym->attributes.set(attr::INT); break;} // case (4h)
@@ -92,3 +119,5 @@ void set_attr(symbol* sym, attr a1) {
 //       break;}
 //    }
 // }
+
+
