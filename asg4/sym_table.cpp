@@ -75,7 +75,7 @@ void traverse(FILE* outfile, astree* root, int depth) {
       case TOK_STRUCT    :{traverse_struct(root,new symbol()); break;} // case (4b)
       case TOK_FUNCTION  :{traverse_function(root, new symbol()); break;} // case (4h)
       case TOK_VARDECL   :{printf("vardecl unimplemented\n"); break;} // case (4k)
-      case TOK_IDENT     :{printf("ident unimplemented\n"); break;} // case (4f)
+      case TOK_IDENT     :{process_id(root); break;} // case (4f)
       default            : {
       for (astree* child: root->children) traverse(outfile, child, depth + 1);
       break;}
@@ -90,6 +90,11 @@ void traverse_struct(astree* root, symbol* struct_sym) {
    string* struct_name = const_cast<string *>(root->children[0]->lexinfo);
    struct_sym->block_nr = 0;
    struct_sym->fields = new symbol_table();
+   if (struct_name == nullptr) {
+        printf("no struct name!!!\n");
+   }else {
+      struct_table->insert({struct_name, struct_sym});
+   }   
    for(astree* child: root->children){
       if(child->symbol == TOK_IDENT){
             child->struct_id = child->lexinfo;//not neccessary
@@ -109,6 +114,8 @@ void traverse_struct(astree* root, symbol* struct_sym) {
       struct_table->insert({struct_name, struct_sym});
    }
 }
+   
+}  
 
 void traverse_function(astree* root, symbol* func_sym) {
    next_block++; // case (3.2b)
@@ -212,6 +219,15 @@ void print_func(symbol* sym, astree* type, astree* name) {
 
 void set_attr(symbol* sym, attr a1) {
    sym->attributes.set(unsigned(a1));
+}
+
+void process_id(astree* root){
+   symbol* id_sym = new symbol();
+   id_sym->lloc = root->children[0]->lloc;
+   id_sym->block_nr = 0;
+   set_attr(id_sym, attr::VARIABLE);//print the type_id before printing these atrribute
+   set_attr(id_sym, attr::LVAL);
+   ident_table_global->insert({const_cast<string *>(root->children[0]->lexinfo),id_sym});
 }
 
 
