@@ -18,11 +18,9 @@ attr attr_reference[] = {
    attr::VREG, attr::VADDR, attr::BITSET_SIZE};
 
 // Symbol Tables
-symbol_table *fn_table;
-symbol_table *struct_table;
-symbol_table *struct_field_table;
-symbol_table *ident_table_global;
-symbol_table *ident_table_local;
+symbol_table *fn_table = new symbol_table();
+symbol_table *struct_table = new symbol_table();
+symbol_table *ident_table_global = new symbol_table();
 
 int global_block_count = 0;
 int next_block = 0;
@@ -79,15 +77,10 @@ void traverse(FILE* outfile, astree* root, int depth) {
 void traverse_struct(astree* root, symbol* struct_sym) {
    size_t seq_num = 0;
    set_attr(struct_sym,attr::STRUCT);//remember to print struct name after this
-   string* struct_name = const_cast<string *>(root->children[0]->lexinfo);
    struct_sym->block_nr = 0;
    struct_sym->fields = new symbol_table();
-   if (struct_name == nullptr) {
-        printf("no struct name!!!\n");
-   }else {
-      struct_table->insert({struct_name, struct_sym});
-   }   
-   for(astree* child: root->children){
+   insert_table_node(root->children[0], struct_sym, struct_table);
+   for(astree* child: root->children) {
       if(child->symbol == TOK_IDENT){
             child->struct_id = child->lexinfo;//not neccessary
       }else{
@@ -99,47 +92,49 @@ void traverse_struct(astree* root, symbol* struct_sym) {
          seq_num++;
       }
    }
-   if (struct_name == nullptr) {
-        printf("no struct name!!!\n");
-   }else {
-      struct_table->insert({struct_name, struct_sym});
-   }
+   insert_table_node(root->children[0], struct_sym, struct_table);
 }
    
 void traverse_function(astree* root, symbol* func_sym) {
    next_block++; // case (3.2b)
-   int cur_block = 1;
-   // >>create new symbol table for storing vars (3.2c)<<
+   int cur_block = 1; // for traversing blocks
    func_sym->lloc = root->lloc;
    func_sym->block_nr = global_block_count;
    set_attr(func_sym, attr::FUNCTION);
-
    for (astree* child: root->children) {
       switch (child->symbol) {
-         case TOK_TYPE_ID  :  {print_func(func_sym, child->children[0], child->children[1]); break;}
+         case TOK_TYPE_ID  :  {print_func(func_sym, child->children[0], child->children[1]); 
+                              insert_table_node(child->children[1], func_sym, fn_table);
+                              break;}
          case TOK_PARAM    :  {fn_read_param(child, func_sym, cur_block); break;}
          case TOK_BLOCK    :  {traverse_block(child, cur_block); break;} // case (4h)
          default           :  break;
       }
    }
    global_block_count++; // case (4g)
-   // >>leaving function so delete the created sym table<<
    // >>need to insert func_sym into function symbol table<<
 }
 
 void traverse_block(astree* root, int cur_block) {
    if (root == NULL) return;
+   // Entering block scope, create new symbol table (3.2c)
+   symbol_table *ident_table_local = new symbol_table();
    int seq_num = 0;
    for (astree* child: root->children) {
       switch (child->symbol) {
-         case TOK_VARDECL     : {fn_read_vardecl(child, cur_block, seq_num++); break;} // print out
+         case TOK_VARDECL     : {fn_read_vardecl(child, cur_block, seq_num++, ident_table_local); break;} // print out
          case TOK_BLOCK       : traverse_block(child, cur_block + 1);
          default              : break;
       }
    }
+   // Leaving block scope, destroy symbol table
+   delete ident_table_local;
+
 }
 
-void fn_read_vardecl(astree* root, size_t block_nr, int seq_num) {
+// Reads local variable declarations inside of a function
+void fn_read_vardecl(astree* root, size_t block_nr, int seq_num, symbol_table* id_table_local) {
+   // Create and set symbol data
    symbol* var_sym = new symbol();
    var_sym->lloc = root->lloc;
    var_sym->block_nr = block_nr;
@@ -147,12 +142,13 @@ void fn_read_vardecl(astree* root, size_t block_nr, int seq_num) {
    set_attr(var_sym, attr::VARIABLE);
    set_attr(var_sym, attr::LVAL);
    set_attr(var_sym, attr::LOCAL);
-   print_local_var(var_sym, root->children[0], root->children[1]);
+   // Insert into local symbol table
+   insert_table_node(root->children[1], var_sym, id_table_local);
+   print_local_ident(var_sym, root->children[0], root->children[1]);
+
+   // for typechecking part: 
    // type: root->children[0]
-   // name: root->children[1] 
-   // thing to set to: root->children[2]
-   
-   // >>need to insert var_sym into local symbol table<<
+   // type to set: root->children[2]
 }
 
 // Reads all parameters of a function
@@ -162,14 +158,15 @@ void fn_read_param(astree* root, symbol* func_sym, size_t block_nr) {
       if (child->symbol == TOK_TYPE_ID) { // Just in case, dont need this line
          if (func_sym->parameters == nullptr)
             func_sym->parameters = new vector<symbol *>;
+         // Create and set symbol data
          symbol* param_sym = new symbol();
-         set_attr(param_sym, attr::VARIABLE);
-         set_attr(param_sym, attr::LVAL);
-         set_attr(param_sym, attr::PARAM);
          param_sym->lloc = child->lloc;
          param_sym->block_nr = block_nr;
          param_sym->sequence = param_num;
-         print_param(param_sym, child->children[0], child->children[1]);
+         set_attr(param_sym, attr::VARIABLE);
+         set_attr(param_sym, attr::LVAL);
+         set_attr(param_sym, attr::PARAM);
+         print_local_ident(param_sym, child->children[0], child->children[1]);
          func_sym->parameters->push_back(param_sym);
          param_num++;
       }
@@ -181,30 +178,7 @@ void fn_read_param(astree* root, symbol* func_sym, size_t block_nr) {
 ////         PRINTING         ////
 //////////////////////////////////
 
-void print_local_var(symbol* sym, astree* type, astree* name) {
-   printf("   %s (%zd.%zd.%zd) {%zd} %s", name->lexinfo->c_str(), 
-         sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
-         sym->block_nr, type->lexinfo->c_str());
-   for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
-      if (sym->attributes[i] == 1) {
-         printf(" %s", to_string(attr_reference[i]).c_str());
-      }
-   }
-   printf("% zd\n", sym->sequence);
-}
-
-void print_param(symbol* sym, astree* type, astree* name) {
-   printf("   %s (%zd.%zd.%zd) {%zd} %s", name->lexinfo->c_str(), 
-         sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
-         sym->block_nr, type->lexinfo->c_str());
-   for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
-      if (sym->attributes[i] == 1) {
-         printf(" %s", to_string(attr_reference[i]).c_str());
-      }
-   }
-   printf(" %zd\n", sym->sequence);
-}
-
+// Print function header
 void print_func(symbol* sym, astree* type, astree* name) {
    printf("\n%s (%zd.%zd.%zd) {%zd} %s", name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
@@ -217,14 +191,33 @@ void print_func(symbol* sym, astree* type, astree* name) {
    printf("\n");
 }
 
+// Print local identifier 3 spaces indented
+void print_local_ident(symbol* sym, astree* type, astree* name) {
+   printf("   %s (%zd.%zd.%zd) {%zd} %s", name->lexinfo->c_str(), 
+         sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
+         sym->block_nr, type->lexinfo->c_str());
+   for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
+      if (sym->attributes[i] == 1) {
+         printf(" %s", to_string(attr_reference[i]).c_str());
+      }
+   }
+   printf(" %zd\n", sym->sequence);
+}
 
 
 /////////////////////////////////
 ////          OTHER          ////
 /////////////////////////////////
 
+// Sets attribute of given symbol
 void set_attr(symbol* sym, attr a1) {
    sym->attributes.set(unsigned(a1));
+}
+
+// Inserts the node containing the name and symbol into st
+void insert_table_node(astree* name, symbol* sym, symbol_table* st) {
+   if (name == nullptr) printf("No name found!");
+   else st->insert({const_cast<string *>(name->lexinfo),sym});
 }
 
 void process_id(astree* root){
@@ -247,5 +240,3 @@ void process_id(astree* root){
 //       break;}
 //    }
 // }
-
-

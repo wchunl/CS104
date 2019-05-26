@@ -44,14 +44,14 @@ void process_id(astree* root);
 
 // Function helper functions
 void fn_read_param(astree* root, symbol* func_sym, size_t block_nr);
-void fn_read_vardecl(astree* root, size_t block_nr, int seq_num);
+void fn_read_vardecl(astree* root, size_t block_nr, int seq_num, symbol_table* id_table_local);
 
 // Print functions
-void print_param(symbol* sym, astree* type, astree* name);
+void print_local_ident(symbol* sym, astree* type, astree* name);
 void print_func(symbol* sym, astree* type, astree* name);
-void print_local_var(symbol* sym, astree* type, astree* name);
 
-// Setting attribute of a symbol
+// Other
 void set_attr(symbol* sym,  attr a1);
+void insert_table_node(astree* name, symbol* sym, symbol_table* st);
 
 #endif
