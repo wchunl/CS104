@@ -10,17 +10,17 @@
 96-unterminated.oc:9:8: warning: missing terminating " character [enabled by default]
     s = "abc|\
         ^
-Hgõ:5.15: invalid source character (")
-Hgõ:5.16: invalid source character (\)
-Hgõ:5.17: syntax error, unexpected '*'
-Hgõ:5.19: invalid source character (")
-Hgõ:6.15: invalid source character (")
-Hgõ:7.9: syntax error, unexpected TOK_IDENT
-Hgõ:7.13: invalid source character (')
-Hgõ:8.8: invalid source character (")
-Hgõ:8.13: invalid source character (\)
-Hgõ:8.14: invalid source character (")
-Hgõ:9.8: invalid source character (")
-Hgõ:9.12: invalid source character (|)
-Hgõ:11.8: invalid token (23foobar)
-Hgõ:11.8: syntax error, unexpected $undefined, expecting TOK_IDENT
+Hg :5.15: invalid source character (")
+Hg :5.16: invalid source character (\)
+Hg :5.17: syntax error, unexpected '*'
+Hg :5.19: invalid source character (")
+Hg :6.15: invalid source character (")
+Hg :7.9: syntax error, unexpected TOK_IDENT
+Hg :7.13: invalid source character (')
+Hg :8.8: invalid source character (")
+Hg :8.13: invalid source character (\)
+Hg :8.14: invalid source character (")
+Hg :9.8: invalid source character (")
+Hg :9.12: invalid source character (|)
+Hg :11.8: invalid token (23foobar)
+Hg :11.8: syntax error, unexpected $undefined, expecting TOK_IDENT
