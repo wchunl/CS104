@@ -13,7 +13,7 @@ using namespace std;
 // Attributes for types and properties (2.2)
 enum class attr {
     VOID, INT, NULLPTR_T, STRING, STRUCT, ARRAY, FUNCTION, VARIABLE,
-    FIELD, TYPEID, PARAM, LOCAL, LVAL, CONST, VREG, VADDR, BITSET_SIZE, NONE
+    FIELD, TYPEID, PARAM, LOCAL, LVAL, CONST, VREG, VADDR, BITSET_SIZE
 };
 using attr_bitset = bitset<unsigned(attr::BITSET_SIZE)>;
 
@@ -32,14 +32,23 @@ struct symbol {
     size_t block_nr;
     vector<symbol*>* parameters;
 };
+
+const string to_string (attr attribute);
+
+// Traverse Functions
 void traverse(FILE* outfile, astree* tree, int depth = 0);
 void traverse_struct(astree* root, symbol* sym);
 void traverse_function(astree* root, symbol* sym);
+void traverse_block(astree* root);
 
 // Function helper functions
 void fn_read_param(astree* root, symbol* func_sym, size_t block_nr);
+void fn_read_vardecl(astree* root);
 
-void print_ident(symbol* sym, astree* type, astree* name);
+// Print functions
+void print_param(symbol* sym, astree* type, astree* name);
+void print_func(symbol* sym, astree* type, astree* name);
+void print_local_var(symbol* sym, astree* type, astree* name);
 
 // Setting attribute of a symbol
 void set_attr(symbol* sym,  attr a1);

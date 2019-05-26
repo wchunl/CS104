@@ -78,10 +78,10 @@ stmt        : vardecl    { $$ = $1; }
             | ';'        { $$ = $1; }
             | expr ';'   { $$ = $1; destroy($2); }
 
-vardecl     : identdecl '=' expr ';' {
-                destroy($4); 
-                $$ = $2->adopt_sym($1,TOK_VARDECL);
-                $$ = $2->adopt($3);}
+vardecl     : type TOK_IDENT '=' expr ';' {
+                destroy($5);
+                $$ = $3->change_sym(TOK_VARDECL);
+                $$ = $3->adopt($1, $2, $4);}
 
 return      : TOK_RETURN expr ';' {destroy($3); $$ = $1->adopt($2);}
             | TOK_RETURN ';'      {
@@ -97,12 +97,11 @@ ifelse      : TOK_IF '(' expr ')'stmt TOK_ELSE stmt {
             | TOK_IF '(' expr ')' stmt %prec TOK_ELSE {
                 $$ = $1->adopt($3,$5); destroy($2,$4); }
 
-block       : '{' block_rec '}' {
-                $$=$1->adopt_sym($2,TOK_BLOCK); destroy($3); }
+block       : block_rec '}' {$$=$1; destroy($2); }
             | '{''}' {
                 $$ = $1->adopt_sym(nullptr,TOK_BLOCK); destroy($2); }
 
-block_rec   : stmt {$$ = $$ = $1;}
+block_rec   : '{' stmt {$$ = $1->adopt_sym($2,TOK_BLOCK);}
             | block_rec stmt { $$ = $1->adopt($2);}
 
 expr        : expr '=' expr         { $$ = $2->adopt($1, $3); }
