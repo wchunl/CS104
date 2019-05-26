@@ -66,8 +66,8 @@ void traverse(FILE* outfile, astree* root, int depth) {
    switch (root->symbol) {
       case TOK_STRUCT    :{traverse_struct(root,new symbol()); break;} // case (4b)
       case TOK_FUNCTION  :{traverse_function(root, new symbol()); break;} // case (4h)
-      case TOK_VARDECL   :{printf("vardecl unimplemented\n"); break;} // case (4k)
-      case TOK_IDENT     :{process_id(root); break;} // case (4f)
+      case TOK_VARDECL   :{process_id(root); break;} // case (4k)
+      case TOK_IDENT     :{printf("We don't need TOK_IDENT"); break;} // case (4f)
       default            : {
       for (astree* child: root->children) traverse(outfile, child, depth + 1);
       break;}
@@ -240,13 +240,13 @@ void print_field(symbol* sym, astree* type, astree* name){
    string ptr = "ptr";
    string array = "array";
    if(strcmp(type->lexinfo->c_str(),ptr.c_str())==0){
-       printf("   %s (%zd.%zd.%zd) {%zd} %s <struct %s>", name->lexinfo->c_str(), 
+       printf("   %s (%zd.%zd.%zd) %s <struct %s>", name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
-         sym->block_nr, type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
+         type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
    }else if(strcmp(type->lexinfo->c_str(),array.c_str())==0){
-      printf("   %s (%zd.%zd.%zd) {%zd} %s <%s>", name->lexinfo->c_str(), 
+      printf("   %s (%zd.%zd.%zd) %s <%s>", name->lexinfo->c_str(), 
        sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
-        sym->block_nr, type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
+         type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
          
    }else{
          printf("   %s (%zd.%zd.%zd)  %s", name->lexinfo->c_str(), 
@@ -260,6 +260,29 @@ void print_field(symbol* sym, astree* type, astree* name){
    }
    printf(" %zd\n", sym->sequence);
 
+}
+void print_globalid(symbol* sym, astree* type, astree* name){
+   string ptr = "ptr";
+   string array = "array";
+   if(strcmp(type->lexinfo->c_str(),ptr.c_str())==0){
+       printf("%s (%zd.%zd.%zd)  %s <struct %s>", name->lexinfo->c_str(), 
+         sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
+         type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
+   }else if(strcmp(type->lexinfo->c_str(),array.c_str())==0){
+      printf("%s (%zd.%zd.%zd) %s <%s>", name->lexinfo->c_str(), 
+       sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset, type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
+         
+   }else{
+         printf("%s (%zd.%zd.%zd)  %s", name->lexinfo->c_str(), 
+         sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
+         type->lexinfo->c_str());
+   }
+   for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
+      if (sym->attributes[i] == 1) {
+         printf(" %s", to_string(attr_reference[i]).c_str());
+      }
+   }
+   printf(" %zd\n", sym->sequence);
 }
 
 
@@ -279,13 +302,17 @@ void insert_table_node(astree* name, symbol* sym, symbol_table* st) {
 }
 
 void process_id(astree* root){
+   size_t seq_num = 0;
    symbol* id_sym = new symbol();
    id_sym->lloc = root->children[0]->lloc;
    id_sym->block_nr = 0;
    set_attr(id_sym, attr::VARIABLE);//print the type_id before printing these atrribute
    set_attr(id_sym, attr::LVAL);
    ident_table_global->insert({const_cast<string *>(root->children[0]->lexinfo),id_sym});
+   print_globalid(id_sym,root->children[0], root->children[1]);
+   seq_num++;
 }
+
 
 
 
