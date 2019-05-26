@@ -39,12 +39,12 @@ const string to_string (attr attribute);
 void traverse(FILE* outfile, astree* tree, int depth = 0);
 void traverse_struct(astree* root, symbol* sym);
 void traverse_function(astree* root, symbol* sym);
-void traverse_block(astree* root);
+void traverse_block(astree* root, int cur_block);
 void process_id(astree* root);
 
 // Function helper functions
 void fn_read_param(astree* root, symbol* func_sym, size_t block_nr);
-void fn_read_vardecl(astree* root);
+void fn_read_vardecl(astree* root, size_t block_nr, int seq_num);
 
 // Print functions
 void print_param(symbol* sym, astree* type, astree* name);
