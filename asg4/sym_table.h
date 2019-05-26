@@ -49,7 +49,8 @@ void fn_read_vardecl(astree* root, size_t block_nr, int seq_num, symbol_table* i
 // Print functions
 void print_local_ident(symbol* sym, astree* type, astree* name);
 void print_func(symbol* sym, astree* type, astree* name);
-
+void print_struct(symbol* sym, astree* name);
+void print_field(symbol* sym, astree* type, astree* name);
 // Other
 void set_attr(symbol* sym,  attr a1);
 void insert_table_node(astree* name, symbol* sym, symbol_table* st);

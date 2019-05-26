@@ -4,6 +4,7 @@
 #include <iostream>
 #include <bitset>
 #include <unordered_map>
+#include <cstring>
 
 #include "sym_table.h"
 #include "astree.h"
@@ -77,9 +78,11 @@ void traverse(FILE* outfile, astree* root, int depth) {
 void traverse_struct(astree* root, symbol* struct_sym) {
    size_t seq_num = 0;
    set_attr(struct_sym,attr::STRUCT);//remember to print struct name after this
+   struct_sym->lloc = root->lloc;
    struct_sym->block_nr = 0;
    struct_sym->fields = new symbol_table();
    insert_table_node(root->children[0], struct_sym, struct_table);
+   print_struct(struct_sym,root->children[0]);
    for(astree* child: root->children) {
       if(child->symbol == TOK_IDENT){
             child->struct_id = child->lexinfo;//not neccessary
@@ -89,7 +92,9 @@ void traverse_struct(astree* root, symbol* struct_sym) {
          field_sym->lloc = child->lloc;
          set_attr(field_sym,attr::FIELD);//print type_id before this
          struct_sym->fields->insert({const_cast<string *>(child->lexinfo),field_sym});   
+         print_field(field_sym, child, child->children[0]);
          seq_num++;
+
       }
    }
    insert_table_node(root->children[0], struct_sym, struct_table);
@@ -123,7 +128,7 @@ void traverse_block(astree* root, int cur_block) {
    for (astree* child: root->children) {
       switch (child->symbol) {
          case TOK_VARDECL     : {fn_read_vardecl(child, cur_block, seq_num++, ident_table_local); break;} // print out
-         case TOK_BLOCK       : traverse_block(child, cur_block + 1);
+         case TOK_BLOCK       : traverse_block(child, cur_block + 1); break;
          default              : break;
       }
    }
@@ -180,9 +185,16 @@ void fn_read_param(astree* root, symbol* func_sym, size_t block_nr) {
 
 // Print function header
 void print_func(symbol* sym, astree* type, astree* name) {
-   printf("\n%s (%zd.%zd.%zd) {%zd} %s", name->lexinfo->c_str(), 
+   string ptr = "ptr";
+   if(strcmp(type->lexinfo->c_str(),ptr.c_str())==0){
+       printf("\n%s (%zd.%zd.%zd) {%zd} %s <struct %s>", name->lexinfo->c_str(), 
+         sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
+         sym->block_nr, type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
+   }else{
+         printf("\n%s (%zd.%zd.%zd) {%zd} %s", name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          sym->block_nr, type->lexinfo->c_str());
+   } 
    for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
       if (sym->attributes[i] == 1) {
          printf(" %s", to_string(attr_reference[i]).c_str());
@@ -193,15 +205,61 @@ void print_func(symbol* sym, astree* type, astree* name) {
 
 // Print local identifier 3 spaces indented
 void print_local_ident(symbol* sym, astree* type, astree* name) {
-   printf("   %s (%zd.%zd.%zd) {%zd} %s", name->lexinfo->c_str(), 
+   string ptr = "ptr";
+   string array = "array";
+   if(strcmp(type->lexinfo->c_str(),ptr.c_str())==0){
+       printf("   %s (%zd.%zd.%zd) {%zd} %s <struct %s>", name->lexinfo->c_str(), 
+       sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
+       sym->block_nr, type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
+   }else if(strcmp(type->lexinfo->c_str(),array.c_str())==0){
+      printf("   %s (%zd.%zd.%zd) {%zd} %s <%s>", name->lexinfo->c_str(), 
+       sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
+        sym->block_nr, type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
+         
+   }else{
+         printf("   %s (%zd.%zd.%zd) {%zd} %s", name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          sym->block_nr, type->lexinfo->c_str());
+   }
    for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
       if (sym->attributes[i] == 1) {
          printf(" %s", to_string(attr_reference[i]).c_str());
       }
    }
    printf(" %zd\n", sym->sequence);
+}
+
+void print_struct(symbol* sym, astree* name){
+   printf("\n%s (%zd.%zd.%zd) {%zd} struct %s\n",name->lexinfo->c_str(),
+            sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
+            sym->block_nr, name->lexinfo->c_str());
+
+}
+
+void print_field(symbol* sym, astree* type, astree* name){
+   string ptr = "ptr";
+   string array = "array";
+   if(strcmp(type->lexinfo->c_str(),ptr.c_str())==0){
+       printf("   %s (%zd.%zd.%zd) {%zd} %s <struct %s>", name->lexinfo->c_str(), 
+         sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
+         sym->block_nr, type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
+   }else if(strcmp(type->lexinfo->c_str(),array.c_str())==0){
+      printf("   %s (%zd.%zd.%zd) {%zd} %s <%s>", name->lexinfo->c_str(), 
+       sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
+        sym->block_nr, type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
+         
+   }else{
+         printf("   %s (%zd.%zd.%zd)  %s", name->lexinfo->c_str(), 
+         sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
+         type->lexinfo->c_str());
+   }
+   for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
+      if (sym->attributes[i] == 1) {
+         printf(" %s", to_string(attr_reference[i]).c_str());
+      }
+   }
+   printf(" %zd\n", sym->sequence);
+
 }
 
 
