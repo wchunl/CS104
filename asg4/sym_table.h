@@ -10,6 +10,8 @@
 #include "astree.h"
 using namespace std;
 
+
+
 // Attributes for types and properties (2.2)
 enum class attr {
     VOID, INT, NULLPTR_T, STRING, STRUCT, ARRAY, FUNCTION, VARIABLE,
@@ -17,11 +19,9 @@ enum class attr {
 };
 using attr_bitset = bitset<unsigned(attr::BITSET_SIZE)>;
 
-struct astree;
 struct symbol;
 using symbol_table = unordered_map<string*,symbol*>;
 using symbol_entry = symbol_table::value_type;
-
 
 // Symbol table node (3.0)
 struct symbol {
@@ -31,9 +31,11 @@ struct symbol {
     location lloc;
     size_t block_nr;
     vector<symbol*>* parameters;
+    attr type;
 };
 
 const string to_string (attr attribute);
+attr to_attr (const string* string);
 
 // Traverse Functions
 void traverse(FILE* outfile, astree* tree, int depth = 0);
@@ -46,14 +48,23 @@ void process_id(astree* root);
 void fn_read_param(astree* root, symbol* func_sym, size_t block_nr);
 void fn_read_vardecl(astree* root, size_t block_nr, int seq_num, symbol_table* id_table_local);
 
-// Print functions
+// Typecheck Functions
+bool typecheck(astree* root);
+bool tc_bin_op(astree* root);
+bool tc_bool_op(astree* root);
+attr get_type(const string* key);
+attr find_type(astree* root);
+
+// Print Functions
 void print_local_ident(symbol* sym, astree* type, astree* name);
 void print_func(symbol* sym, astree* type, astree* name);
 void print_struct(symbol* sym, astree* name);
 void print_field(symbol* sym, astree* type, astree* name);
 void print_globalid(symbol* sym, astree* type, astree* name);
+
 // Other
 void set_attr(symbol* sym,  attr a1);
 void insert_table_node(astree* name, symbol* sym, symbol_table* st);
+void dump_tables();
 
 #endif

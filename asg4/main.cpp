@@ -122,6 +122,9 @@ int main (int argc, char** argv) {
     int fclose_rc = fclose(sym_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
+    // DEBUGGING REMOVE WHEN SUBMITTING
+    // dump_tables();
+
     // Dump stringset into str file
     FILE* str_out = fopen(str_out_name.c_str(),"w");
     string_set::dump(str_out);
