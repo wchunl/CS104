@@ -15,6 +15,42 @@
 #include "string_set.h"
 #include "lyutils.h"
 
+
+attr attr_references[] = { 
+   attr::VOID, attr::INT, attr::NULLPTR_T, attr::STRING, attr::STRUCT,
+   attr::ARRAY, attr::FUNCTION, attr::VARIABLE, attr::FIELD, 
+   attr::TYPEID, attr::PARAM, attr::LOCAL, attr::LVAL, attr::CONST, 
+   attr::VREG, attr::VADDR, attr::BITSET_SIZE};
+
+// Convert attr to string for printing
+const string to_string (attr attribute) {
+   static const unordered_map<attr,string> hash {
+      {attr::VOID       , "void"       },
+      {attr::INT        , "int"        },
+      {attr::NULLPTR_T  , "null"       },
+      {attr::STRING     , "string"     },
+      {attr::STRUCT     , "struct"     },
+      {attr::ARRAY      , "array"      },
+      {attr::FUNCTION   , "function"   },
+      {attr::VARIABLE   , "variable"   },
+      {attr::FIELD      , "field"      },
+      {attr::TYPEID     , "typeid"     },
+      {attr::PARAM      , "param"      },
+      {attr::LOCAL      , "local"      },
+      {attr::LVAL       , "lval"       },
+      {attr::CONST      , "const"      },
+      {attr::VREG       , "vreg"       },
+      {attr::VADDR      , "vaddr"      },
+      {attr::BITSET_SIZE, "bitset_size"},
+   };
+   auto str = hash.find (attribute);
+   if (str == hash.end()) {
+      throw invalid_argument (string (__PRETTY_FUNCTION__) + ": "
+                              + to_string (unsigned (attribute)));
+   }
+   return str->second;
+}
+
 astree::astree (int symbol_, const location& lloc_, const char* info) {
    symbol = symbol_;
    lloc = lloc_;
@@ -81,10 +117,21 @@ void astree::dump (FILE* outfile, astree* tree) {
 }
 
 void astree::print (FILE* outfile, astree* tree, int depth) {
-   for (int i = 0; i < depth; i++) fprintf(outfile, "|   ");
-   fprintf (outfile, "%s \"%s\" (%zd.%zd.%zd)\n",
-            parser::get_tname (tree->symbol), tree->lexinfo->c_str(),
-            tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset);
+
+ //  for (int i = 0; i < depth; i++) fprintf(outfile, "|   ");
+   if (tree == NULL) return;
+   char* tname = const_cast<char*> (parser::get_tname(tree->symbol));
+   if(strstr(tname,"TOK_") == tname) tname+=4;
+   set_attribute(tree);
+   fprintf (outfile, "%s \"%s\" (%zd.%zd.%zd) {%d}",
+            tname, tree->lexinfo->c_str(),
+            tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset,depth);
+   for (long unsigned int i = 0; i < tree->attributes.size(); i++) {
+      if (tree->attributes[i] == 1) {
+         fprintf(outfile," %s", to_string(attr_references[i]).c_str());
+      }
+   }
+   fprintf(outfile,"\n");
    for (astree* child: tree->children) {
       astree::print (outfile, child, depth + 1);
    }
@@ -107,4 +154,72 @@ void errllocprintf (const location& lloc, const char* format,
    errprintf ("%s:%zd.%zd: %s", 
               lexer::filename (lloc.filenr), lloc.linenr, lloc.offset,
               buffer);
+}
+//set attribute of a given root
+void set_attribute(astree* root){
+   int sym = root->symbol;
+   switch(sym){
+       case TOK_VOID:
+         root->attributes.set(unsigned(attr::VOID));
+         break;
+       case TOK_INT:
+         root->attributes.set(unsigned(attr::INT));
+         break;
+       case TOK_STRING:
+         root->attributes.set(unsigned(attr::STRING));
+         break;
+       case TOK_ARRAY:
+           root->attributes.set(unsigned(attr::ARRAY));
+           break;
+       case TOK_FUNCTION:
+         root->attributes.set(unsigned(attr::FUNCTION));
+         break;
+       // case TOK_FIELD:
+       //   root->attributes.set(unsigned(attr::FIELD));
+       //   break;
+       case TOK_TYPE_ID:
+         root->attributes.set(unsigned(attr::TYPEID));
+         break;
+       case TOK_VARDECL:
+         root->attributes.set(unsigned(attr::VARIABLE));
+         root->attributes.set(unsigned(attr::LVAL));
+         break;
+       case TOK_PARAM:
+         root->attributes.set(unsigned(attr::PARAM));
+         break;
+       case TOK_IDENT:
+         root->attributes.set(unsigned(attr::VARIABLE));
+         break;
+       case '+': case '-': case '*': case '/': case '%': case '=': 
+         root->attributes.set(unsigned(attr::INT));
+         root->attributes.set(unsigned(attr::VREG));
+         break;
+       case TOK_INTCON:
+         root->attributes.set(unsigned(attr::INT));
+         root->attributes.set(unsigned(attr::CONST));
+         break;
+      case TOK_CHARCON:
+         root->attributes.set(unsigned(attr::INT));
+         root->attributes.set(unsigned(attr::CONST));
+         break;
+       case TOK_STRINGCON:
+         root->attributes.set(unsigned(attr::STRING));
+         root->attributes.set(unsigned(attr::CONST));
+         break;
+       case TOK_NULLPTR:
+         root->attributes.set(unsigned(attr::NULLPTR_T));
+         root->attributes.set(unsigned(attr::CONST));
+         break;
+       case TOK_GE: case TOK_LT: case TOK_GT: case TOK_LE:case TOK_EQ:
+         root->attributes.set(unsigned(attr::VREG));
+         break;
+       case TOK_INDEX:
+         root->attributes.set(unsigned(attr::LVAL));
+         root->attributes.set(unsigned(attr::VADDR));
+         break;
+       case TOK_ARROW:
+         root->attributes.set(unsigned(attr::LVAL));
+         root->attributes.set(unsigned(attr::VADDR));
+         break;
+  }
 }

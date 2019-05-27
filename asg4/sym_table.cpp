@@ -7,15 +7,14 @@
 #include <cstring>
 
 #include "sym_table.h"
-#include "astree.h"
 #include "lyutils.h"
 
 using namespace std;
 
-attr attr_reference[] = { 
-   attr::VOID, attr::INT, attr::NULLPTR_T, attr::STRING, attr::STRUCT,
-   attr::ARRAY, attr::FUNCTION, attr::VARIABLE, attr::FIELD, 
-   attr::TYPEID, attr::PARAM, attr::LOCAL, attr::LVAL, attr::CONST, 
+ attr attr_reference[] = { 
+    attr::VOID, attr::INT, attr::NULLPTR_T, attr::STRING, attr::STRUCT,
+    attr::ARRAY, attr::FUNCTION, attr::VARIABLE, attr::FIELD, 
+    attr::TYPEID, attr::PARAM, attr::LOCAL, attr::LVAL, attr::CONST, 
    attr::VREG, attr::VADDR, attr::BITSET_SIZE};
 
 // Symbol Tables
@@ -25,36 +24,6 @@ symbol_table *ident_table_global = new symbol_table();
 
 int global_block_count = 0;
 int next_block = 0;
-
-// Convert attr to string for printing
-const string to_string (attr attribute) {
-   static const unordered_map<attr,string> hash {
-      {attr::VOID       , "void"       },
-      {attr::INT        , "int"        },
-      {attr::NULLPTR_T  , "null"       },
-      {attr::STRING     , "string"     },
-      {attr::STRUCT     , "struct"     },
-      {attr::ARRAY      , "array"      },
-      {attr::FUNCTION   , "function"   },
-      {attr::VARIABLE   , "variable"   },
-      {attr::FIELD      , "field"      },
-      {attr::TYPEID     , "typeid"     },
-      {attr::PARAM      , "param"      },
-      {attr::LOCAL      , "local"      },
-      {attr::LVAL       , "lval"       },
-      {attr::CONST      , "const"      },
-      {attr::VREG       , "vreg"       },
-      {attr::VADDR      , "vaddr"      },
-      {attr::BITSET_SIZE, "bitset_size"},
-   };
-   auto str = hash.find (attribute);
-   if (str == hash.end()) {
-      throw invalid_argument (string (__PRETTY_FUNCTION__) + ": "
-                              + to_string (unsigned (attribute)));
-   }
-   return str->second;
-}
-
 
 //////////////////////////////////
 ////        TRAVERSALS        ////
@@ -265,15 +234,15 @@ void print_globalid(symbol* sym, astree* type, astree* name){
    string ptr = "ptr";
    string array = "array";
    if(strcmp(type->lexinfo->c_str(),ptr.c_str())==0){
-       printf("%s (%zd.%zd.%zd)  %s <struct %s>", name->lexinfo->c_str(), 
+       printf("\n%s (%zd.%zd.%zd)  %s <struct %s>", name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
    }else if(strcmp(type->lexinfo->c_str(),array.c_str())==0){
-      printf("%s (%zd.%zd.%zd) %s <%s>", name->lexinfo->c_str(), 
+      printf("\n%s (%zd.%zd.%zd) %s <%s>", name->lexinfo->c_str(), 
        sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset, type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
          
    }else{
-         printf("%s (%zd.%zd.%zd)  %s", name->lexinfo->c_str(), 
+         printf("\n%s (%zd.%zd.%zd)  %s", name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          type->lexinfo->c_str());
    }
@@ -325,3 +294,5 @@ void process_id(astree* root){
 //       break;}
 //    }
 // }
+
+
