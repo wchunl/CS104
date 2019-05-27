@@ -13,11 +13,11 @@ using namespace std;
 
 
 // Attributes for types and properties (2.2)
-enum class attr {
-    VOID, INT, NULLPTR_T, STRING, STRUCT, ARRAY, FUNCTION, VARIABLE,
-    FIELD, TYPEID, PARAM, LOCAL, LVAL, CONST, VREG, VADDR, BITSET_SIZE
-};
-using attr_bitset = bitset<unsigned(attr::BITSET_SIZE)>;
+// enum class attr {
+//     VOID, INT, NULLPTR_T, STRING, STRUCT, ARRAY, FUNCTION, VARIABLE,
+//     FIELD, TYPEID, PARAM, LOCAL, LVAL, CONST, VREG, VADDR, BITSET_SIZE
+// };
+// using attr_bitset = bitset<unsigned(attr::BITSET_SIZE)>;
 
 struct symbol;
 using symbol_table = unordered_map<string*,symbol*>;

@@ -10,9 +10,18 @@
 #include <string>
 #include <vector>
 #include <bitset>
+#include <unordered_map>
+
 using namespace std;
 
+
 #include "auxlib.h"
+// Attributes for types and properties (2.2)
+enum class attr {
+    VOID, INT, NULLPTR_T, STRING, STRUCT, ARRAY, FUNCTION, VARIABLE,
+    FIELD, TYPEID, PARAM, LOCAL, LVAL, CONST, VREG, VADDR, BITSET_SIZE
+};
+using attr_bitset = bitset<unsigned(attr::BITSET_SIZE)>;
 
 struct location {
    size_t filenr;
@@ -29,6 +38,7 @@ struct astree {
    vector<astree*> children; // children of this n-way node
    const string* struct_id;
    const char* type;
+   attr_bitset attributes;//add bitset field to astree 
 
    // Functions.
    astree (int symbol, const location&, const char* lexinfo);
@@ -39,6 +49,7 @@ struct astree {
    astree* change_sym(int symbol_);
    void dump_node (FILE*);
    void dump_tree (FILE*, int depth = 0);
+
    static void dump (FILE* outfile, astree* tree);
    static void print (FILE* outfile, astree* tree, int depth = 0);
 };
@@ -46,8 +57,9 @@ struct astree {
 void destroy (astree* tree1, astree* tree2 = nullptr ,
                astree* tree3 = nullptr,astree* tree4 = nullptr,
                astree* tree5 = nullptr);
-
+void set_attribute(astree* root);
 void errllocprintf (const location&, const char* format, const char*);
+const string to_string (attr attribute);
 
 #endif
 
