@@ -53,7 +53,7 @@ attr to_attr (const string* s) {
    };
    auto str = hash.find(*s);
    if (str == hash.end()) {
-      printf("error in to_attr, ignored\n");
+      // printf("error in to_attr, ignored\n");
       return attr::NULLPTR_T;
       // exit(-1);
    }
@@ -151,9 +151,9 @@ void traverse_block(astree* root, int cur_block) {
          case TOK_RETURN      : break;
          default              : {
             if (typecheck(child)) {
-               printf("TYPECHECK = TRUE\n");
+               // printf("TYPECHECK = TRUE\n");
             } else {
-               printf("TYPECHECK = FALSE\n");
+               // printf("TYPECHECK = FALSE\n");
             };
             break;
          }
@@ -227,7 +227,13 @@ bool typecheck(astree* root) {
    // The passed root is one of the following:
    switch (root->symbol) {
       case TOK_WHILE     : // fallthrough
-      case TOK_IF        : return typecheck(root->children[0]);
+      case TOK_IFELSE    : // fallthrough
+      case TOK_IF        : {
+         if (root->children[2] != nullptr) {
+            return (typecheck(root->children[0]) 
+               && typecheck(root->children[2]));
+         }
+      };
       case '='           : break;
       case '+'           : // fallthrough
       case '-'           : // fallthrough
@@ -259,20 +265,20 @@ bool tc_bin_op(astree* root) {
    astree* left = root->children[0];
    astree* right = root->children[1];
 
-   printf(">>type check: %s  {%s}  %s\n", 
-      left->lexinfo->c_str(), root->lexinfo->c_str(), 
-      right->lexinfo->c_str());
+   // printf(">>type check: %s  {%s}  %s\n", 
+      // left->lexinfo->c_str(), root->lexinfo->c_str(), 
+      // right->lexinfo->c_str());
 
    if(find_type(left) == find_type(right)) {
       if (find_type(left) == attr::INT) {
          root->type = to_string(find_type(left)).c_str();
-         printf("%s   | finaltype: %s\n", 
-            root->lexinfo->c_str(), root->type);
+         // printf("%s   | finaltype: %s\n", 
+         //    root->lexinfo->c_str(), root->type);
          return true;
       }
    }
 
-   printf("\nerror in tc_bin_op\n");
+   // printf("\nerror in tc_bin_op\n");
    return false;
    // exit(-1);
 }
@@ -282,15 +288,15 @@ bool tc_bool_op(astree* root) {
    astree* left = root->children[0];
    astree* right = root->children[1];
 
-   printf(">>type check: %s  {%s}  %s\n", 
-      left->lexinfo->c_str(), root->lexinfo->c_str(), 
-      right->lexinfo->c_str());
+   // printf(">>type check: %s  {%s}  %s\n", 
+   //    left->lexinfo->c_str(), root->lexinfo->c_str(), 
+   //    right->lexinfo->c_str());
 
    // Check if types are same
    if(find_type(left) == find_type(right)) {
       root->type = to_string(find_type(left)).c_str();
-      printf("%s   | finaltype: %s\n", 
-         root->lexinfo->c_str(), root->type);
+      // printf("%s   | finaltype: %s\n", 
+      //    root->lexinfo->c_str(), root->type);
       return true;
    }
 
@@ -298,25 +304,25 @@ bool tc_bool_op(astree* root) {
    if(find_type(left) == attr::NULLPTR_T 
       && find_type(right) != attr::NULLPTR_T) {
          root->type = to_string(find_type(right)).c_str();
-         printf("%s   | finaltype: %s\n", 
-            root->lexinfo->c_str(), root->type);
+         // printf("%s   | finaltype: %s\n", 
+         //    root->lexinfo->c_str(), root->type);
          return true;
    } else if(find_type(right) == attr::NULLPTR_T 
       && find_type(left) != attr::NULLPTR_T) {
          root->type = to_string(find_type(left)).c_str();
-         printf("%s   | finaltype: %s\n", 
-            root->lexinfo->c_str(), root->type);
+         // printf("%s   | finaltype: %s\n", 
+         //    root->lexinfo->c_str(), root->type);
          return true;
    }
 
-   printf("\nerror in tc_bool_op\n");
+   // printf("\nerror in tc_bool_op\n");
    return false;
    // exit(-1);
 }
 
 attr find_type(astree* root) {
       switch(root->symbol) {
-         case TOK_IDENT       : return get_type(root->lexinfo);
+         case TOK_IDENT       : {return get_type(root->lexinfo);} 
          case TOK_INTCON      : return attr::INT;
          case TOK_CHARCON     : return attr::INT;
          case TOK_STRINGCON   : return attr::STRING;
@@ -331,7 +337,7 @@ attr find_type(astree* root) {
       string_set::intern (root->type));
 
    // return to_attr(string(root->type));
-   printf("error in find_type");
+   // printf("error in find_type");
    // exit(-1);
    return attr::NULLPTR_T;
 }
@@ -350,8 +356,28 @@ attr get_type(const string* key) {
       return j->second->type;
    }
 
-   printf("error in get_type");
+   // printf("error in get_type");
    return attr::NULLPTR_T;
+   // exit(-1);
+}
+
+location get_lloc(const string* key) {
+   // Seach local table first
+   auto i = ident_table_local->find(const_cast<string *>(key));
+   if (i != ident_table_local->end()) {
+      return i->second->lloc;
+   }
+
+   // Search global table next
+   auto j = ident_table_global->find(const_cast<string *>(key));
+   if (j != ident_table_global->end()) {
+      return j->second->lloc;
+   }
+
+   // printf("error in get_type");
+   location* null_lloc = new location();
+   null_lloc->filenr = null_lloc->linenr = null_lloc->offset = -1;
+   return *null_lloc;
    // exit(-1);
 }
 

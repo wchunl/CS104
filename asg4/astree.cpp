@@ -4,6 +4,7 @@
 // Shineng Tang
 // stang38
 
+#include <iostream>
 #include <assert.h>
 #include <inttypes.h>
 #include <stdarg.h>
@@ -12,6 +13,7 @@
 #include <string.h>
 
 #include "astree.h"
+#include "sym_table.h"
 #include "string_set.h"
 #include "lyutils.h"
 
@@ -117,22 +119,46 @@ void astree::dump (FILE* outfile, astree* tree) {
 }
 
 void astree::print (FILE* outfile, astree* tree, int depth) {
-
- //  for (int i = 0; i < depth; i++) fprintf(outfile, "|   ");
-   if (tree == NULL) return;
-   char* tname = const_cast<char*> (parser::get_tname(tree->symbol));
-   if(strstr(tname,"TOK_") == tname) tname+=4;
+   for (int i = 0; i < depth; i++) fprintf(outfile, "|   ");
+   fprintf (outfile, "%s \"%s\" (%zd.%zd.%zd)",
+            parser::get_tname (tree->symbol), tree->lexinfo->c_str(),
+            tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset);
+   // Added this
    set_attribute(tree);
-   fprintf (outfile, "%s \"%s\" (%zd.%zd.%zd) {%d}",
-            tname, tree->lexinfo->c_str(),
-            tree->lloc.filenr, tree->lloc.linenr, 
-            tree->lloc.offset,depth);
+
+   // If tree is an expression...
+   if(is_expr(tree)) {
+      if (tree->type != NULL) fprintf(outfile, " %s", tree->type);
+   }
+
+   // Print the type, if any
+   if(strcmp(parser::get_tname(tree->symbol), "TOK_IDENT") == 0) {
+      if (get_type(tree->lexinfo) != attr::NULLPTR_T) {
+         fprintf(outfile, " %s", to_string(
+            get_type(tree->lexinfo)).c_str());
+      }
+   }
+
+   // Print the attributes
    for (long unsigned int i = 0; i < tree->attributes.size(); i++) {
       if (tree->attributes[i] == 1) {
          fprintf(outfile," %s", to_string(attr_references[i]).c_str());
       }
    }
+
+   // Print the declaration location
+   if(strcmp(parser::get_tname(tree->symbol), "TOK_IDENT") == 0) {
+      if (get_lloc(tree->lexinfo).filenr != static_cast<size_t>(-1)) {
+            fprintf(outfile, " (%zd.%zd.%zd)", 
+            get_lloc(tree->lexinfo).filenr,
+            get_lloc(tree->lexinfo).linenr,
+            get_lloc(tree->lexinfo).offset);
+      }
+   }
+
    fprintf(outfile,"\n");
+
+   // Recurse on all children
    for (astree* child: tree->children) {
       astree::print (outfile, child, depth + 1);
    }
@@ -156,6 +182,28 @@ void errllocprintf (const location& lloc, const char* format,
               lexer::filename (lloc.filenr), lloc.linenr, lloc.offset,
               buffer);
 }
+
+bool is_expr(astree* root) {
+   switch(root->symbol) {
+      case TOK_WHILE     : // fallthrough 
+      case TOK_IF        : // fallthrough
+      case '='           : // fallthrough 
+      case '+'           : // fallthrough 
+      case '-'           : // fallthrough 
+      case '/'           : // fallthrough 
+      case '*'           : // fallthrough 
+      case '%'           : // fallthrough 
+      case '<'           : // fallthrough 
+      case TOK_LE        : // fallthrough 
+      case '>'           : // fallthrough 
+      case TOK_GE        : // fallthrough
+      case TOK_EQ        : // fallthrough
+      case TOK_NE        : // fallthrough
+      case TOK_NOT       : return true;
+      default            : return false;
+   }
+}
+
 //set attribute of a given root
 void set_attribute(astree* root){
    int sym = root->symbol;

@@ -46,6 +46,7 @@ bool tc_bin_op(astree* root);
 bool tc_bool_op(astree* root);
 attr get_type(const string* key);
 attr find_type(astree* root);
+location get_lloc(const string* key);
 
 // Print Functions
 void print_local_ident(symbol* sym, astree* type, astree* name);
@@ -58,5 +59,6 @@ void print_globalid(symbol* sym, astree* type, astree* name);
 void set_attr(symbol* sym,  attr a1);
 void insert_table_node(astree* name, symbol* sym, symbol_table* st);
 void dump_tables();
+
 
 #endif

@@ -57,6 +57,7 @@ struct astree {
 void destroy (astree* tree1, astree* tree2 = nullptr ,
                astree* tree3 = nullptr,astree* tree4 = nullptr,
                astree* tree5 = nullptr);
+bool is_expr(astree* root);
 void set_attribute(astree* root);
 void errllocprintf (const location&, const char* format, const char*);
 const string to_string (attr attribute);
