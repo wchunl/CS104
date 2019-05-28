@@ -125,7 +125,8 @@ void astree::print (FILE* outfile, astree* tree, int depth) {
    set_attribute(tree);
    fprintf (outfile, "%s \"%s\" (%zd.%zd.%zd) {%d}",
             tname, tree->lexinfo->c_str(),
-            tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset,depth);
+            tree->lloc.filenr, tree->lloc.linenr, 
+            tree->lloc.offset,depth);
    for (long unsigned int i = 0; i < tree->attributes.size(); i++) {
       if (tree->attributes[i] == 1) {
          fprintf(outfile," %s", to_string(attr_references[i]).c_str());

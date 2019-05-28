@@ -5,9 +5,11 @@
 #include <bitset>
 #include <unordered_map>
 #include <cstring>
+#include <string>
 
 #include "sym_table.h"
 #include "lyutils.h"
+#include "string_set.h"
 
 using namespace std;
 
@@ -26,34 +28,7 @@ symbol_table *ident_table_local = new symbol_table();
 int global_block_count = 0;
 int next_block = 0;
 
-// Convert attr to string for printing
-// const string to_string (attr attribute) {
-//    static const unordered_map<attr,string> hash {
-//       {attr::VOID       , "void"       },
-//       {attr::INT        , "int"        },
-//       {attr::NULLPTR_T  , "null"       },
-//       {attr::STRING     , "string"     },
-//       {attr::STRUCT     , "struct"     },
-//       {attr::ARRAY      , "array"      },
-//       {attr::FUNCTION   , "function"   },
-//       {attr::VARIABLE   , "variable"   },
-//       {attr::FIELD      , "field"      },
-//       {attr::TYPEID     , "typeid"     },
-//       {attr::PARAM      , "param"      },
-//       {attr::LOCAL      , "local"      },
-//       {attr::LVAL       , "lval"       },
-//       {attr::CONST      , "const"      },
-//       {attr::VREG       , "vreg"       },
-//       {attr::VADDR      , "vaddr"      },
-//       {attr::BITSET_SIZE, "bitset_size"},
-//    };
-//    auto str = hash.find (attribute);
-//    if (str == hash.end()) {
-//       throw invalid_argument (string (__PRETTY_FUNCTION__) + ": "
-//                               + to_string (unsigned (attribute)));
-//    }
-//    return str->second;
-// }
+FILE* sym_file;
 
 // Convert string to attr for printing
 attr to_attr (const string* s) {
@@ -78,8 +53,9 @@ attr to_attr (const string* s) {
    };
    auto str = hash.find(*s);
    if (str == hash.end()) {
-      printf("error in to_attr");
-      exit(-1);
+      printf("error in to_attr, ignored\n");
+      return attr::NULLPTR_T;
+      // exit(-1);
    }
    return str->second;
 }
@@ -91,6 +67,7 @@ attr to_attr (const string* s) {
 
 // Main traverse function
 void traverse(FILE* outfile, astree* root, int depth) {
+   sym_file = outfile;
    if (root == NULL) return;
    switch (root->symbol) {
       case TOK_STRUCT    :{traverse_struct(root,new symbol()); 
@@ -195,10 +172,14 @@ void fn_read_vardecl(astree* root, size_t block_nr, int seq_num,
    var_sym->lloc = root->lloc;
    var_sym->block_nr = block_nr;
    var_sym->sequence = seq_num;
-   if (root->children[0]->symbol != TOK_PTR)
-      var_sym->type = to_attr(root->children[0]->lexinfo);
-   else 
-      var_sym->type = attr::STRUCT;
+
+   switch (root->children[0]->symbol) {
+      case TOK_PTR     : {var_sym->type = attr::STRUCT; break;}
+      case TOK_ARRAY   : {var_sym->type = to_attr(
+                           root->children[0]->children[0]->lexinfo); 
+                           break;}
+      default: var_sym->type = to_attr(root->children[0]->lexinfo);
+   }
    set_attr(var_sym, attr::VARIABLE);
    set_attr(var_sym, attr::LVAL);
    set_attr(var_sym, attr::LOCAL);
@@ -223,6 +204,7 @@ void fn_read_param(astree* root, symbol* func_sym, size_t block_nr) {
          param_sym->lloc = child->lloc;
          param_sym->block_nr = block_nr;
          param_sym->sequence = param_num;
+         param_sym->type = to_attr(child->children[0]->lexinfo);
          set_attr(param_sym, attr::VARIABLE);
          set_attr(param_sym, attr::LVAL);
          set_attr(param_sym, attr::PARAM);
@@ -246,7 +228,7 @@ bool typecheck(astree* root) {
    switch (root->symbol) {
       case TOK_WHILE     : // fallthrough
       case TOK_IF        : return typecheck(root->children[0]);
-      case '='           : return tc_bool_op(root);
+      case '='           : break;
       case '+'           : // fallthrough
       case '-'           : // fallthrough
       case '/'           : // fallthrough
@@ -273,31 +255,61 @@ bool typecheck(astree* root) {
 
 // Binary operators
 bool tc_bin_op(astree* root) {
+   if (root->children.size() < 2) return false;
    astree* left = root->children[0];
-   astree* right = root->children[0];
+   astree* right = root->children[1];
+
+   printf(">>type check: %s  {%s}  %s\n", 
+      left->lexinfo->c_str(), root->lexinfo->c_str(), 
+      right->lexinfo->c_str());
 
    if(find_type(left) == find_type(right)) {
       if (find_type(left) == attr::INT) {
          root->type = to_string(find_type(left)).c_str();
+         printf("%s   | finaltype: %s\n", 
+            root->lexinfo->c_str(), root->type);
          return true;
       }
    }
 
-   printf("error in tc_bin_op");
+   printf("\nerror in tc_bin_op\n");
    return false;
    // exit(-1);
 }
 
 bool tc_bool_op(astree* root) {
+   if (root->children.size() < 2) return false;
    astree* left = root->children[0];
-   astree* right = root->children[0];
+   astree* right = root->children[1];
 
+   printf(">>type check: %s  {%s}  %s\n", 
+      left->lexinfo->c_str(), root->lexinfo->c_str(), 
+      right->lexinfo->c_str());
+
+   // Check if types are same
    if(find_type(left) == find_type(right)) {
       root->type = to_string(find_type(left)).c_str();
+      printf("%s   | finaltype: %s\n", 
+         root->lexinfo->c_str(), root->type);
       return true;
    }
 
-   printf("error in tc_bool_op");
+   //Case (2.4a), assume the type
+   if(find_type(left) == attr::NULLPTR_T 
+      && find_type(right) != attr::NULLPTR_T) {
+         root->type = to_string(find_type(right)).c_str();
+         printf("%s   | finaltype: %s\n", 
+            root->lexinfo->c_str(), root->type);
+         return true;
+   } else if(find_type(right) == attr::NULLPTR_T 
+      && find_type(left) != attr::NULLPTR_T) {
+         root->type = to_string(find_type(left)).c_str();
+         printf("%s   | finaltype: %s\n", 
+            root->lexinfo->c_str(), root->type);
+         return true;
+   }
+
+   printf("\nerror in tc_bool_op\n");
    return false;
    // exit(-1);
 }
@@ -310,7 +322,15 @@ attr find_type(astree* root) {
          case TOK_STRINGCON   : return attr::STRING;
          case TOK_NULLPTR     : return attr::NULLPTR_T;
          case TOK_ARROW       : return find_type(root->children[1]);
+         case TOK_INDEX       : return find_type(root->children[0]);
+         default              : typecheck(root);
    }
+
+
+   if (root->type != NULL) return to_attr(
+      string_set::intern (root->type));
+
+   // return to_attr(string(root->type));
    printf("error in find_type");
    // exit(-1);
    return attr::NULLPTR_T;
@@ -343,24 +363,25 @@ attr get_type(const string* key) {
 // Print function header
 void print_func(symbol* sym, astree* type, astree* name) {
    string ptr = "ptr";
+   if (global_block_count != 0) fprintf(sym_file, "\n");
    if(strcmp(type->lexinfo->c_str(),ptr.c_str())==0){
-       printf("\n%s (%zd.%zd.%zd) {%zd} %s <struct %s>", 
+      fprintf(sym_file, "%s (%zd.%zd.%zd) {%zd} %s <struct %s>", 
          name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          sym->block_nr, type->lexinfo->c_str(),
          type->children[0]->lexinfo->c_str());
    }else{
-      printf("\n%s (%zd.%zd.%zd) {%zd} %s", 
+      fprintf(sym_file, "%s (%zd.%zd.%zd) {%zd} %s", 
          name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          sym->block_nr, type->lexinfo->c_str());
    }
    for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
       if (sym->attributes[i] == 1) {
-         printf(" %s", to_string(attr_reference[i]).c_str());
+         fprintf(sym_file, " %s",to_string(attr_reference[i]).c_str());
       }
    }
-   printf("\n");
+   fprintf(sym_file, "\n");
 }
 
 // Print local identifier 3 spaces indented
@@ -368,33 +389,33 @@ void print_local_ident(symbol* sym, astree* type, astree* name) {
    string ptr = "ptr";
    string array = "array";
    if(strcmp(type->lexinfo->c_str(),ptr.c_str())==0){
-      printf("   %s (%zd.%zd.%zd) {%zd} %s <struct %s>", 
+      fprintf(sym_file, "   %s (%zd.%zd.%zd) {%zd} %s <struct %s>", 
          name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          sym->block_nr, type->lexinfo->c_str(),
          type->children[0]->lexinfo->c_str());
    }else if(strcmp(type->lexinfo->c_str(),array.c_str())==0){
-      printf("   %s (%zd.%zd.%zd) {%zd} %s <%s>", 
+      fprintf(sym_file, "   %s (%zd.%zd.%zd) {%zd} %s <%s>", 
          name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          sym->block_nr, type->lexinfo->c_str(),
          type->children[0]->lexinfo->c_str());
    }else{
-      printf("   %s (%zd.%zd.%zd) {%zd} %s", 
+      fprintf(sym_file, "   %s (%zd.%zd.%zd) {%zd} %s", 
          name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          sym->block_nr, type->lexinfo->c_str());
    }
    for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
       if (sym->attributes[i] == 1) {
-         printf(" %s", to_string(attr_reference[i]).c_str());
+         fprintf(sym_file, " %s",to_string(attr_reference[i]).c_str());
       }
    }
-   printf(" %zd\n", sym->sequence);
+   fprintf(sym_file, " %zd\n", sym->sequence);
 }
 
 void print_struct(symbol* sym, astree* name){
-   printf("\n%s (%zd.%zd.%zd) {%zd} struct %s\n",
+   fprintf(sym_file, "\n%s (%zd.%zd.%zd) {%zd} struct %s\n",
             name->lexinfo->c_str(),
             sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
             sym->block_nr, name->lexinfo->c_str());
@@ -404,51 +425,56 @@ void print_field(symbol* sym, astree* type, astree* name){
    string ptr = "ptr";
    string array = "array";
    if(strcmp(type->lexinfo->c_str(),ptr.c_str())==0){
-       printf("   %s (%zd.%zd.%zd) %s <struct %s>", 
+       fprintf(sym_file, "   %s (%zd.%zd.%zd) %s <struct %s>", 
          name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
    }else if(strcmp(type->lexinfo->c_str(),array.c_str())==0){
-      printf("   %s (%zd.%zd.%zd) %s <%s>", 
+      fprintf(sym_file, "   %s (%zd.%zd.%zd) %s <%s>", 
          name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
          
    }else{
-         printf("   %s (%zd.%zd.%zd)  %s", name->lexinfo->c_str(), 
+      fprintf(sym_file, "   %s (%zd.%zd.%zd)  %s", 
+         name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          type->lexinfo->c_str());
    }
    for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
       if (sym->attributes[i] == 1) {
-         printf(" %s", to_string(attr_reference[i]).c_str());
+         fprintf(sym_file, " %s",to_string(attr_reference[i]).c_str());
       }
    }
-   printf(" %zd\n", sym->sequence);
+   fprintf(sym_file, " %zd\n", sym->sequence);
 }
 
 void print_globalid(symbol* sym, astree* type, astree* name) {
    string ptr = "ptr";
    string array = "array";
    if(strcmp(type->lexinfo->c_str(),ptr.c_str())==0){
-       printf("\n%s (%zd.%zd.%zd)  %s <struct %s>", name->lexinfo->c_str(), 
+      fprintf(sym_file, "\n%s (%zd.%zd.%zd)  %s <struct %s>", 
+         name->lexinfo->c_str(),
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
    }else if(strcmp(type->lexinfo->c_str(),array.c_str())==0){
-      printf("\n%s (%zd.%zd.%zd) %s <%s>", name->lexinfo->c_str(), 
-       sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset, type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
+      fprintf(sym_file, "\n%s (%zd.%zd.%zd) %s <%s>", 
+         name->lexinfo->c_str(), 
+         sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset, 
+         type->lexinfo->c_str(),type->children[0]->lexinfo->c_str());
          
    }else{
-         printf("\n%s (%zd.%zd.%zd)  %s", name->lexinfo->c_str(), 
+      fprintf(sym_file, "\n%s (%zd.%zd.%zd)  %s", 
+         name->lexinfo->c_str(), 
          sym->lloc.filenr, sym->lloc.linenr, sym->lloc.offset,
          type->lexinfo->c_str());
    }
    for (long unsigned int i = 0; i < sym->attributes.size(); i++) {
       if (sym->attributes[i] == 1) {
-         printf(" %s", to_string(attr_reference[i]).c_str());
+         fprintf(sym_file, " %s",to_string(attr_reference[i]).c_str());
       }
    }
-   printf(" %zd\n", sym->sequence);
+   fprintf(sym_file, " %zd\n", sym->sequence);
 }
 
 /////////////////////////////////
@@ -509,6 +535,15 @@ void dump_tables() {
          if (pair.second->attributes[i] == 1) 
             printf(" %s", to_string(attr_reference[i]).c_str());
       printf("\n");
+   }   printf("\n\n---- Printing ident_table_local ----\n\n");
+   for (auto const& pair: (*ident_table_local)) {
+      printf("name: %-10s | lloc: (%zd.%zd.%zd)", pair.first->c_str(),
+         pair.second->lloc.filenr, pair.second->lloc.linenr, 
+         pair.second->lloc.offset);
+      for (long unsigned int i=0; i<pair.second->attributes.size();i++)
+         if (pair.second->attributes[i] == 1) 
+            printf(" %s", to_string(attr_reference[i]).c_str());
+      printf(" | type: %s", to_string(pair.second->type).c_str());
+      printf("\n");
    }
-   
 }

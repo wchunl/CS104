@@ -10,15 +10,6 @@
 #include "astree.h"
 using namespace std;
 
-
-
-// Attributes for types and properties (2.2)
-// enum class attr {
-//     VOID, INT, NULLPTR_T, STRING, STRUCT, ARRAY, FUNCTION, VARIABLE,
-//     FIELD, TYPEID, PARAM, LOCAL, LVAL, CONST, VREG, VADDR, BITSET_SIZE
-// };
-// using attr_bitset = bitset<unsigned(attr::BITSET_SIZE)>;
-
 struct symbol;
 using symbol_table = unordered_map<string*,symbol*>;
 using symbol_entry = symbol_table::value_type;
@@ -46,7 +37,8 @@ void process_id(astree* root);
 
 // Function helper functions
 void fn_read_param(astree* root, symbol* func_sym, size_t block_nr);
-void fn_read_vardecl(astree* root, size_t block_nr, int seq_num, symbol_table* id_table_local);
+void fn_read_vardecl(astree* root, size_t block_nr, int seq_num, 
+                            symbol_table* id_table_local);
 
 // Typecheck Functions
 bool typecheck(astree* root);
