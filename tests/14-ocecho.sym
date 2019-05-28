@@ -1,0 +1,24 @@
+fail (6.22.1) {0} void function
+   expr (6.22.12) {1} string variable param lval 0
+   file (6.22.25) {1} string variable param lval 1
+   line (6.22.38) {1} int variable param lval 2
+
+putchr (6.24.1) {1} void function
+   chr (6.24.14) {1} int variable param lval 0
+
+putint (6.25.1) {2} void function
+   num (6.25.14) {1} int variable param lval 0
+
+putstr (6.26.1) {3} void function
+   str (6.26.14) {1} string variable param lval 0
+
+getchr (6.28.1) {4} int function
+
+getstr (6.29.1) {5} string function
+
+getln (6.30.1) {6} string function
+
+main (7.5.1) {7} int function
+   argc (7.5.10) {1} int variable param lval 0
+   argv (7.5.20) {1} array <string> variable param lval 1
+   argi (7.6.13) {1} int variable local lval 0

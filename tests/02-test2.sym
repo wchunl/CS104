@@ -1,0 +1,10 @@
+
+node (4.1.1) {0} struct node
+   foo (4.2.5)  int field 0
+   node (4.3.5) ptr <struct node> field 1
+func (4.5.1) {0} ptr <struct node> function
+   head (4.5.25) {1} ptr <struct node> variable param lval 0
+   length (4.5.49) {1} int variable param lval 1
+   a (4.6.11) {1} int variable local lval 0
+   b (4.7.14) {1} string variable local lval 1
+   c (4.8.25) {1} ptr <struct node> variable local lval 2

@@ -92,4 +92,3 @@
 ; 7. 77:    print_array (count, words);
 ; 7. 78:    return 0;
 ; 7. 79: }
-hello

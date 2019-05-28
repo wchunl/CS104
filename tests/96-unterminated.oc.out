@@ -14,4 +14,4 @@
 ; 4. 10: 
 ; 4. 11:    int 23foobar;
 ; 4. 12: }
-hello
+We don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENT

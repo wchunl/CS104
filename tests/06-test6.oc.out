@@ -31,4 +31,3 @@
 ; 7. 16:    array<string> sa = alloc<array<string>>(10);
 ; 7. 17:    return 0;
 ; 7. 18: }
-hello

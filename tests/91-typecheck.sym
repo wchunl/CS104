@@ -1,0 +1,4 @@
+foo (5.11.1) {0} void function
+
+foo (5.12.1) {1} void function
+   a (5.12.11) {1} int variable param lval 0

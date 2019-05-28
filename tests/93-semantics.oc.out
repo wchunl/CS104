@@ -17,4 +17,3 @@
 ; 4. 13:    int y = a==b;
 ; 4. 14:    return "foobar";
 ; 4. 15: }
-hello

@@ -26,4 +26,4 @@
 ; 5. 29:    if (a == b) f (x);
 ; 5. 30:    if (a != b) y = 3; else f (y, z);
 ; 5. 31: }
-hello
+We don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENTWe don't need TOK_IDENT

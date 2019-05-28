@@ -1,0 +1,16 @@
+struct node {
+    int foo;
+    ptr <struct node> link;
+};
+ptr <struct node> func (ptr <struct node> head, int length) {
+    int a = 0;
+    string b = "";
+    ptr <struct node> c = alloc <struct node>();
+    if (a < 3) {
+        a=length;
+        c=c->link;
+    }else {
+        if (0 == 0) a = 8;
+        else b = "foo";
+    }
+}

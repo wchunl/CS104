@@ -1,105 +1,105 @@
 ROOT "" (0.0.0)
-|   TOK_FUNCTION "" (6.22.1)
-|   |   TOK_TYPE_ID "" (6.22.1)
-|   |   |   TOK_VOID "void" (6.22.1)
-|   |   |   TOK_IDENT "fail" (6.22.6)
-|   |   TOK_PARAM "(" (6.22.11)
-|   |   |   TOK_TYPE_ID "" (6.22.12)
-|   |   |   |   TOK_STRING "string" (6.22.12)
-|   |   |   |   TOK_IDENT "expr" (6.22.19)
-|   |   |   TOK_TYPE_ID "" (6.22.25)
-|   |   |   |   TOK_STRING "string" (6.22.25)
-|   |   |   |   TOK_IDENT "file" (6.22.32)
-|   |   |   TOK_TYPE_ID "" (6.22.38)
-|   |   |   |   TOK_INT "int" (6.22.38)
-|   |   |   |   TOK_IDENT "line" (6.22.42)
-|   TOK_FUNCTION "" (6.24.1)
-|   |   TOK_TYPE_ID "" (6.24.1)
-|   |   |   TOK_VOID "void" (6.24.1)
-|   |   |   TOK_IDENT "putchr" (6.24.6)
-|   |   TOK_PARAM "(" (6.24.13)
-|   |   |   TOK_TYPE_ID "" (6.24.14)
-|   |   |   |   TOK_INT "int" (6.24.14)
-|   |   |   |   TOK_IDENT "chr" (6.24.18)
-|   TOK_FUNCTION "" (6.25.1)
-|   |   TOK_TYPE_ID "" (6.25.1)
-|   |   |   TOK_VOID "void" (6.25.1)
-|   |   |   TOK_IDENT "putint" (6.25.6)
-|   |   TOK_PARAM "(" (6.25.13)
-|   |   |   TOK_TYPE_ID "" (6.25.14)
-|   |   |   |   TOK_INT "int" (6.25.14)
-|   |   |   |   TOK_IDENT "num" (6.25.18)
-|   TOK_FUNCTION "" (6.26.1)
-|   |   TOK_TYPE_ID "" (6.26.1)
-|   |   |   TOK_VOID "void" (6.26.1)
-|   |   |   TOK_IDENT "putstr" (6.26.6)
-|   |   TOK_PARAM "(" (6.26.13)
-|   |   |   TOK_TYPE_ID "" (6.26.14)
-|   |   |   |   TOK_STRING "string" (6.26.14)
-|   |   |   |   TOK_IDENT "str" (6.26.21)
-|   TOK_FUNCTION "" (6.28.1)
-|   |   TOK_TYPE_ID "" (6.28.1)
-|   |   |   TOK_INT "int" (6.28.1)
-|   |   |   TOK_IDENT "getchr" (6.28.5)
-|   |   TOK_PARAM "(" (6.28.11)
-|   TOK_FUNCTION "" (6.29.1)
-|   |   TOK_TYPE_ID "" (6.29.1)
-|   |   |   TOK_STRING "string" (6.29.1)
-|   |   |   TOK_IDENT "getstr" (6.29.8)
-|   |   TOK_PARAM "(" (6.29.14)
-|   TOK_FUNCTION "" (6.30.1)
-|   |   TOK_TYPE_ID "" (6.30.1)
-|   |   |   TOK_STRING "string" (6.30.1)
-|   |   |   TOK_IDENT "getln" (6.30.8)
-|   |   TOK_PARAM "(" (6.30.13)
+|   TOK_FUNCTION "" (6.22.1) function
+|   |   TOK_TYPE_ID "" (6.22.1) typeid
+|   |   |   TOK_VOID "void" (6.22.1) void
+|   |   |   TOK_IDENT "fail" (6.22.6) variable
+|   |   TOK_PARAM "(" (6.22.11) param
+|   |   |   TOK_TYPE_ID "" (6.22.12) typeid
+|   |   |   |   TOK_STRING "string" (6.22.12) string
+|   |   |   |   TOK_IDENT "expr" (6.22.19) string variable (6.22.12)
+|   |   |   TOK_TYPE_ID "" (6.22.25) typeid
+|   |   |   |   TOK_STRING "string" (6.22.25) string
+|   |   |   |   TOK_IDENT "file" (6.22.32) string variable (6.22.25)
+|   |   |   TOK_TYPE_ID "" (6.22.38) typeid
+|   |   |   |   TOK_INT "int" (6.22.38) int
+|   |   |   |   TOK_IDENT "line" (6.22.42) int variable (6.22.38)
+|   TOK_FUNCTION "" (6.24.1) function
+|   |   TOK_TYPE_ID "" (6.24.1) typeid
+|   |   |   TOK_VOID "void" (6.24.1) void
+|   |   |   TOK_IDENT "putchr" (6.24.6) variable
+|   |   TOK_PARAM "(" (6.24.13) param
+|   |   |   TOK_TYPE_ID "" (6.24.14) typeid
+|   |   |   |   TOK_INT "int" (6.24.14) int
+|   |   |   |   TOK_IDENT "chr" (6.24.18) int variable (6.24.14)
+|   TOK_FUNCTION "" (6.25.1) function
+|   |   TOK_TYPE_ID "" (6.25.1) typeid
+|   |   |   TOK_VOID "void" (6.25.1) void
+|   |   |   TOK_IDENT "putint" (6.25.6) variable
+|   |   TOK_PARAM "(" (6.25.13) param
+|   |   |   TOK_TYPE_ID "" (6.25.14) typeid
+|   |   |   |   TOK_INT "int" (6.25.14) int
+|   |   |   |   TOK_IDENT "num" (6.25.18) int variable (6.25.14)
+|   TOK_FUNCTION "" (6.26.1) function
+|   |   TOK_TYPE_ID "" (6.26.1) typeid
+|   |   |   TOK_VOID "void" (6.26.1) void
+|   |   |   TOK_IDENT "putstr" (6.26.6) variable
+|   |   TOK_PARAM "(" (6.26.13) param
+|   |   |   TOK_TYPE_ID "" (6.26.14) typeid
+|   |   |   |   TOK_STRING "string" (6.26.14) string
+|   |   |   |   TOK_IDENT "str" (6.26.21) string variable (6.26.14)
+|   TOK_FUNCTION "" (6.28.1) function
+|   |   TOK_TYPE_ID "" (6.28.1) typeid
+|   |   |   TOK_INT "int" (6.28.1) int
+|   |   |   TOK_IDENT "getchr" (6.28.5) variable
+|   |   TOK_PARAM "(" (6.28.11) param
+|   TOK_FUNCTION "" (6.29.1) function
+|   |   TOK_TYPE_ID "" (6.29.1) typeid
+|   |   |   TOK_STRING "string" (6.29.1) string
+|   |   |   TOK_IDENT "getstr" (6.29.8) variable
+|   |   TOK_PARAM "(" (6.29.14) param
+|   TOK_FUNCTION "" (6.30.1) function
+|   |   TOK_TYPE_ID "" (6.30.1) typeid
+|   |   |   TOK_STRING "string" (6.30.1) string
+|   |   |   TOK_IDENT "getln" (6.30.8) variable
+|   |   TOK_PARAM "(" (6.30.13) param
 |   TOK_STRUCT "struct" (7.5.1)
-|   |   TOK_IDENT "foo" (7.5.8)
-|   |   TOK_INT "int" (7.6.4)
-|   |   |   TOK_TYPE_ID "a" (7.6.8)
-|   TOK_FUNCTION "" (7.9.1)
-|   |   TOK_TYPE_ID "" (7.9.1)
-|   |   |   TOK_INT "int" (7.9.1)
-|   |   |   TOK_IDENT "main" (7.9.5)
-|   |   TOK_PARAM "(" (7.9.9)
+|   |   TOK_IDENT "foo" (7.5.8) variable
+|   |   TOK_INT "int" (7.6.4) int
+|   |   |   TOK_TYPE_ID "a" (7.6.8) typeid
+|   TOK_FUNCTION "" (7.9.1) function
+|   |   TOK_TYPE_ID "" (7.9.1) typeid
+|   |   |   TOK_INT "int" (7.9.1) int
+|   |   |   TOK_IDENT "main" (7.9.5) variable
+|   |   TOK_PARAM "(" (7.9.9) param
 |   |   TOK_BLOCK "{" (7.9.12)
-|   |   |   TOK_VARDECL "=" (7.10.10)
-|   |   |   |   TOK_INT "int" (7.10.4)
-|   |   |   |   TOK_IDENT "a" (7.10.8)
-|   |   |   |   TOK_INTCON "6" (7.10.12)
-|   |   |   TOK_VARDECL "=" (7.11.22)
+|   |   |   TOK_VARDECL "=" (7.10.10) variable lval
+|   |   |   |   TOK_INT "int" (7.10.4) int
+|   |   |   |   TOK_IDENT "a" (7.10.8) int variable (7.10.10)
+|   |   |   |   TOK_INTCON "6" (7.10.12) int const
+|   |   |   TOK_VARDECL "=" (7.11.22) variable lval
 |   |   |   |   TOK_PTR "ptr" (7.11.4)
-|   |   |   |   |   TOK_TYPE_ID "foo" (7.11.15)
-|   |   |   |   TOK_IDENT "b" (7.11.20)
+|   |   |   |   |   TOK_TYPE_ID "foo" (7.11.15) typeid
+|   |   |   |   TOK_IDENT "b" (7.11.20) struct variable (7.11.22)
 |   |   |   |   TOK_ALLOC "alloc" (7.11.24)
-|   |   |   |   |   TOK_TYPE_ID "foo" (7.11.37)
-|   |   |   '=' "=" (7.12.9)
-|   |   |   |   TOK_ARROW "->" (7.12.5)
-|   |   |   |   |   TOK_IDENT "b" (7.12.4)
-|   |   |   |   |   TOK_IDENT "a" (7.12.7)
-|   |   |   |   TOK_INTCON "8" (7.12.11)
-|   |   |   '=' "=" (7.13.6)
-|   |   |   |   TOK_IDENT "a" (7.13.4)
-|   |   |   |   '+' "+" (7.13.17)
-|   |   |   |   |   '*' "*" (7.13.10)
-|   |   |   |   |   |   TOK_IDENT "a" (7.13.8)
-|   |   |   |   |   |   TOK_ARROW "->" (7.13.13)
-|   |   |   |   |   |   |   TOK_IDENT "b" (7.13.12)
-|   |   |   |   |   |   |   TOK_IDENT "a" (7.13.15)
-|   |   |   |   |   TOK_INTCON "6" (7.13.19)
+|   |   |   |   |   TOK_TYPE_ID "foo" (7.11.37) typeid
+|   |   |   '=' "=" (7.12.9) int vreg
+|   |   |   |   TOK_ARROW "->" (7.12.5) lval vaddr
+|   |   |   |   |   TOK_IDENT "b" (7.12.4) struct variable (7.11.22)
+|   |   |   |   |   TOK_IDENT "a" (7.12.7) int variable (7.10.10)
+|   |   |   |   TOK_INTCON "8" (7.12.11) int const
+|   |   |   '=' "=" (7.13.6) int vreg
+|   |   |   |   TOK_IDENT "a" (7.13.4) int variable (7.10.10)
+|   |   |   |   '+' "+" (7.13.17) int vreg
+|   |   |   |   |   '*' "*" (7.13.10) int vreg
+|   |   |   |   |   |   TOK_IDENT "a" (7.13.8) int variable (7.10.10)
+|   |   |   |   |   |   TOK_ARROW "->" (7.13.13) lval vaddr
+|   |   |   |   |   |   |   TOK_IDENT "b" (7.13.12) struct variable (7.11.22)
+|   |   |   |   |   |   |   TOK_IDENT "a" (7.13.15) int variable (7.10.10)
+|   |   |   |   |   TOK_INTCON "6" (7.13.19) int const
 |   |   |   ';' ";" (7.13.21)
 |   |   |   TOK_CALL "(" (7.14.11)
-|   |   |   |   TOK_IDENT "putint" (7.14.4)
-|   |   |   |   TOK_IDENT "a" (7.14.12)
+|   |   |   |   TOK_IDENT "putint" (7.14.4) variable
+|   |   |   |   TOK_IDENT "a" (7.14.12) int variable (7.10.10)
 |   |   |   TOK_CALL "(" (7.15.11)
-|   |   |   |   TOK_IDENT "putchr" (7.15.4)
-|   |   |   |   TOK_CHARCON "' '" (7.15.12)
+|   |   |   |   TOK_IDENT "putchr" (7.15.4) variable
+|   |   |   |   TOK_CHARCON "' '" (7.15.12) int const
 |   |   |   TOK_CALL "(" (7.16.11)
-|   |   |   |   TOK_IDENT "putint" (7.16.4)
-|   |   |   |   TOK_ARROW "->" (7.16.13)
-|   |   |   |   |   TOK_IDENT "b" (7.16.12)
-|   |   |   |   |   TOK_IDENT "a" (7.16.15)
+|   |   |   |   TOK_IDENT "putint" (7.16.4) variable
+|   |   |   |   TOK_ARROW "->" (7.16.13) lval vaddr
+|   |   |   |   |   TOK_IDENT "b" (7.16.12) struct variable (7.11.22)
+|   |   |   |   |   TOK_IDENT "a" (7.16.15) int variable (7.10.10)
 |   |   |   TOK_CALL "(" (7.17.11)
-|   |   |   |   TOK_IDENT "putchr" (7.17.4)
-|   |   |   |   TOK_CHARCON "'\n'" (7.17.12)
+|   |   |   |   TOK_IDENT "putchr" (7.17.4) variable
+|   |   |   |   TOK_CHARCON "'\n'" (7.17.12) int const
 |   |   |   TOK_RETURN "return" (7.18.4)
-|   |   |   |   TOK_INTCON "0" (7.18.11)
+|   |   |   |   TOK_INTCON "0" (7.18.11) int const

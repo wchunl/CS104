@@ -24,10 +24,9 @@
 ; 7.  9:    putchr ('[');
 ; 7. 10:    putint (10);
 ; 7. 11:    putstr ("] compiled ");
-; 7. 12:    putstr ("May 25 2019");
+; 7. 12:    putstr ("May 27 2019");
 ; 7. 13:    putstr (" ");
-; 7. 14:    putstr ("22:21:43");
+; 7. 14:    putstr ("21:20:55");
 ; 7. 15:    putstr ("\n");
 ; 7. 16:    return 0;
 ; 7. 17: }
-hello

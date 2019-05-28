@@ -1,0 +1,20 @@
+; 0.  1: # 1 "02-test2.oc"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "02-test2.oc"
+; 4.  1: struct node {
+; 4.  2:     int foo;
+; 4.  3:     ptr <struct node> link;
+; 4.  4: };
+; 4.  5: ptr <struct node> func (ptr <struct node> head, int length) {
+; 4.  6:     int a = 0;
+; 4.  7:     string b = "";
+; 4.  8:     ptr <struct node> c = alloc <struct node>();
+; 4.  9:     if (a < 3) {
+; 4. 10:         a=length;
+; 4. 11:         c=c->link;
+; 4. 12:     }else {
+; 4. 13:         if (0 == 0) a = 8;
+; 4. 14:         else b = "foo";
+; 4. 15:     }
+; 4. 16: }

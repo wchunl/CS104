@@ -10,4 +10,4 @@
 ; 4.  6: public static int main (String[] args) {
 ; 4.  7:    System.exit (255);
 ; 4.  8: }
-hello
+We don't need TOK_IDENT

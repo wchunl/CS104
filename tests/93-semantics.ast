@@ -1,32 +1,32 @@
 ROOT "" (0.0.0)
 |   ';' ";" (4.7.14)
-|   TOK_FUNCTION "" (4.9.1)
-|   |   TOK_TYPE_ID "" (4.9.1)
-|   |   |   TOK_INT "int" (4.9.1)
-|   |   |   TOK_IDENT "main" (4.9.5)
-|   |   TOK_PARAM "(" (4.9.9)
+|   TOK_FUNCTION "" (4.9.1) function
+|   |   TOK_TYPE_ID "" (4.9.1) typeid
+|   |   |   TOK_INT "int" (4.9.1) int
+|   |   |   TOK_IDENT "main" (4.9.5) variable
+|   |   TOK_PARAM "(" (4.9.9) param
 |   |   TOK_BLOCK "{" (4.9.12)
-|   |   |   TOK_VARDECL "=" (4.10.10)
-|   |   |   |   TOK_INT "int" (4.10.4)
-|   |   |   |   TOK_IDENT "c" (4.10.8)
-|   |   |   |   '+' "+" (4.10.14)
-|   |   |   |   |   TOK_IDENT "a" (4.10.12)
-|   |   |   |   |   TOK_IDENT "b" (4.10.16)
-|   |   |   TOK_VARDECL "=" (4.11.11)
-|   |   |   |   TOK_VOID "void" (4.11.4)
-|   |   |   |   TOK_IDENT "n" (4.11.9)
-|   |   |   |   TOK_IDENT "null" (4.11.13)
-|   |   |   TOK_VARDECL "=" (4.12.10)
-|   |   |   |   TOK_INT "int" (4.12.4)
-|   |   |   |   TOK_IDENT "x" (4.12.8)
+|   |   |   TOK_VARDECL "=" (4.10.10) variable lval
+|   |   |   |   TOK_INT "int" (4.10.4) int
+|   |   |   |   TOK_IDENT "c" (4.10.8) int variable (4.10.10)
+|   |   |   |   '+' "+" (4.10.14) int vreg
+|   |   |   |   |   TOK_IDENT "a" (4.10.12) variable
+|   |   |   |   |   TOK_IDENT "b" (4.10.16) variable
+|   |   |   TOK_VARDECL "=" (4.11.11) variable lval
+|   |   |   |   TOK_VOID "void" (4.11.4) void
+|   |   |   |   TOK_IDENT "n" (4.11.9) void variable (4.11.11)
+|   |   |   |   TOK_IDENT "null" (4.11.13) variable
+|   |   |   TOK_VARDECL "=" (4.12.10) variable lval
+|   |   |   |   TOK_INT "int" (4.12.4) int
+|   |   |   |   TOK_IDENT "x" (4.12.8) int variable (4.12.10)
 |   |   |   |   '<' "<" (4.12.14)
-|   |   |   |   |   TOK_IDENT "a" (4.12.12)
-|   |   |   |   |   TOK_IDENT "b" (4.12.16)
-|   |   |   TOK_VARDECL "=" (4.13.10)
-|   |   |   |   TOK_INT "int" (4.13.4)
-|   |   |   |   TOK_IDENT "y" (4.13.8)
-|   |   |   |   TOK_EQ "==" (4.13.13)
-|   |   |   |   |   TOK_IDENT "a" (4.13.12)
-|   |   |   |   |   TOK_IDENT "b" (4.13.15)
+|   |   |   |   |   TOK_IDENT "a" (4.12.12) variable
+|   |   |   |   |   TOK_IDENT "b" (4.12.16) variable
+|   |   |   TOK_VARDECL "=" (4.13.10) variable lval
+|   |   |   |   TOK_INT "int" (4.13.4) int
+|   |   |   |   TOK_IDENT "y" (4.13.8) int variable (4.13.10)
+|   |   |   |   TOK_EQ "==" (4.13.13) vreg
+|   |   |   |   |   TOK_IDENT "a" (4.13.12) variable
+|   |   |   |   |   TOK_IDENT "b" (4.13.15) variable
 |   |   |   TOK_RETURN "return" (4.14.4)
-|   |   |   |   TOK_STRINGCON ""foobar"" (4.14.11)
+|   |   |   |   TOK_STRINGCON ""foobar"" (4.14.11) string const

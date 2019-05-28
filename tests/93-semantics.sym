@@ -1,0 +1,5 @@
+main (4.9.1) {0} int function
+   c (4.10.10) {1} int variable local lval 0
+   n (4.11.11) {1} void variable local lval 1
+   x (4.12.10) {1} int variable local lval 2
+   y (4.13.10) {1} int variable local lval 3
