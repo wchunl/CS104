@@ -22,6 +22,7 @@ using namespace std;
 #include "lyutils.h"
 #include "string_set.h"
 #include "sym_table.h"
+#include "emit.h"
 
 const string cpp_name = "/usr/bin/cpp -nostdinc";
 string cpp_command;
@@ -104,7 +105,8 @@ int main (int argc, char** argv) {
     string tok_out_name = basename + ".tok";
     string ast_out_name = basename + ".ast";
     string sym_out_name = basename + ".sym";
-
+    string oil_out_name = basename + ".oil";
+    
     // Open token file for streaming
     tok_out = fopen(tok_out_name.c_str(),"w");
     if(tok_out == NULL) {exec::exit_status = EXIT_FAILURE;}
@@ -116,14 +118,20 @@ int main (int argc, char** argv) {
     fclose(tok_out);
     cpp_pclose();
 
+    // generate oil file
+    FILE* oil_out = fopen(oil_out_name.c_str(),"w");
+    emit(oil_out, parser::root);
+    int fclose_rc = fclose(oil_out);
+    if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
+
     // Dump symbol tree into sym file
     FILE* sym_out = fopen(sym_out_name.c_str(),"w");
     traverse(sym_out, parser::root);
-    int fclose_rc = fclose(sym_out);
+    fclose_rc = fclose(sym_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
     // DEBUGGING REMOVE WHEN SUBMITTING
-     dump_tables();
+   //  dump_tables();
 
     // Dump stringset into str file
     FILE* str_out = fopen(str_out_name.c_str(),"w");

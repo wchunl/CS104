@@ -107,9 +107,6 @@ int main (int argc, char** argv) {
     tok_out = fopen(tok_out_name.c_str(),"w");
     if(tok_out == NULL) {exec::exit_status = EXIT_FAILURE;}
     yyparse();
-
-    printf("hello");
-
     // Close token file and pipe
     fclose(tok_out);
     cpp_pclose();
