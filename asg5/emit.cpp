@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+#include <string.h>
 
 #include "emit.h"
 #include "string_set.h"
@@ -39,19 +40,21 @@ void emit_struct(FILE* outfile,astree* root){
     for(auto *field: root->children){
         switch(field->symbol){
             case TOK_IDENT:
-                printf(".struct: %s\n",field->lexinfo->c_str());
+                printf("%-9s%3s\n",".struct:",field->lexinfo->c_str());
                 break;
             case TOK_INT:
-                printf(".field: int %s\n",field->children[0]->lexinfo->c_str());
+                printf("%-9s%3s %s\n",".field:","int",
+                    field->children[0]->lexinfo->c_str());
                 break;
             default:
-                printf(".field: ptr %s\n",field->children[0]->lexinfo->c_str()); 
+                printf("%-9s%3s %s\n",".field:","ptr",
+                    field->children[0]->lexinfo->c_str()); 
                 break;     
         }
     }
     printf(".end\n");
 }
-
+//not done with struct IDENT
 void emit_function(FILE* outfile,astree* root){
     for(auto *child: root->children){
         switch(child->symbol){
@@ -60,8 +63,15 @@ void emit_function(FILE* outfile,astree* root){
                 emit_param(outfile,child);
                 break;
             case TOK_TYPE_ID:
-                printf("%s:%15s %s\n",child->children[1]->lexinfo->c_str(),
-                    ".funcion", child->children[0]->lexinfo->c_str());
+                if(child->children[0]->symbol == TOK_STRING){
+                    printf("%-9s%5s %s\n",strcat(const_cast<char*>
+                    (child->children[1]->lexinfo->c_str()),":"),
+                    ".funcion", "ptr");
+                }else{
+                    printf("%-9s%5s %s\n",strcat(const_cast<char*>
+                        (child->children[1]->lexinfo->c_str()),":"),
+                        ".funcion",child->children[0]->lexinfo->c_str());
+                }
                 break;
         }
     }
@@ -71,7 +81,8 @@ void emit_function(FILE* outfile,astree* root){
 void emit_param(FILE* outfile,astree* root){
     for(auto *child: root->children){
         if(child->children[0]->symbol == TOK_INT){
-            printf("%15s %s %s\n",".param",child->children[0]->lexinfo->c_str()
+            printf("%15s %s %s\n",".param"
+                ,child->children[0]->lexinfo->c_str()
                 ,child->children[1]->lexinfo->c_str());
         }else{
              printf("%15s %s %s\n",".param","ptr"
