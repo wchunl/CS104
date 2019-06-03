@@ -112,7 +112,9 @@ void emit_block(FILE* outfile,astree* root){
                 printf("%15s %s\n", "return",child->children[0]->lexinfo->c_str());
                 printf("%15s\n", "return");
                 break;
-            case TOK_CALL: break;
+            case TOK_CALL: 
+
+                break;
             case TOK_IF: break;
             case TOK_IFELSE: break;
             case '=' : break;
@@ -145,8 +147,8 @@ void emit_while(FILE* outfile,astree* root){
     register_nr++;
 
     //create do, call emit_block
-    if(root->children[0]->children[1]->symbol == TOK_BLOCK){
-        printf("%s%d:",".do",while_nr);
+    if(root->children[1]->symbol == TOK_BLOCK){
+        printf("%s%d:\n",".do",while_nr);
         emit_block(outfile,root);
     }
 
