@@ -118,20 +118,17 @@ int main (int argc, char** argv) {
     fclose(tok_out);
     cpp_pclose();
 
-    // generate oil file
-    FILE* oil_out = fopen(oil_out_name.c_str(),"w");
-    emit(oil_out, parser::root);
-    int fclose_rc = fclose(oil_out);
-    if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
-
     // Dump symbol tree into sym file
     FILE* sym_out = fopen(sym_out_name.c_str(),"w");
     traverse(sym_out, parser::root);
-    fclose_rc = fclose(sym_out);
+    int fclose_rc = fclose(sym_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
-    // DEBUGGING REMOVE WHEN SUBMITTING
-   //  dump_tables();
+    // generate oil file
+    FILE* oil_out = fopen(oil_out_name.c_str(),"w");
+    emit(oil_out, parser::root);
+    fclose_rc = fclose(oil_out);
+    if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
     // Dump stringset into str file
     FILE* str_out = fopen(str_out_name.c_str(),"w");

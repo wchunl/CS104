@@ -6,11 +6,19 @@
 #include <stdio.h>
 
 void emit(FILE* outfile, astree* root, int depth = 0);
-void emit_struct(FILE* outfile,astree* root);
-void emit_function(FILE* outfile,astree*root);
-void emit_param(FILE* outfile,astree* root);
-void emit_block(FILE* outfile,astree* root);
-void emit_while(FILE* outfile,astree* root);
+void emit_struct(astree* root);
+void emit_function(astree*root);
+void emit_param(astree* root);
+void emit_block(astree* root);
+void emit_while(astree* root);
+void emit_if(astree* root);
 
+// Expression functions
+void emit_expr(astree* root);
+void emit_bin_expr(astree*root);
+
+// Other
+int get_reg_nr(const char* key);
+void debug_regis();
 
 #endif
