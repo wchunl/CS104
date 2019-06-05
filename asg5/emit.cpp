@@ -127,6 +127,15 @@ void emit_param(astree* root){
 
 // TOK_VARDECL and expressions checked in emit_expr()
 void emit_block(astree* root){
+    // Need to check if the first node in this block
+    // generates a label. If it does, print newline
+    if (root->children.size() > 0) {
+        switch(root->children[0]->symbol) {
+            case TOK_IF     : 
+            case TOK_WHILE  : printf("\n");
+        }
+    }
+
     for(auto* child: root->children){
         switch(child->symbol){
             case TOK_RETURN : 
@@ -235,17 +244,18 @@ void emit_while(astree* root){
 
     // Print goto if not...
     printf("\t  goto .od%d if not $t%d:i\n",
-        while_nr, register_nr);
+        while_nr, register_nr++);
 
-    // If there is a block, call it
+    // If there is a block, emit it
     if(root->children[1]->symbol == TOK_BLOCK){
         printf(".do%d:", while_nr);
         emit_block(root->children[1]);
-    }else{
+    }else{ // Else emit the statement
         printf(".do%d:", while_nr);
         emit_expr(root->children[1]);
     }
 
+    // Print the while end
     printf(".od%d:", while_nr);
 }
 
@@ -322,8 +332,8 @@ void emit_unary_expr(astree* root) {
     if(root->children[0]->children.size() == 0) {
         printf("\t  $t%d:i = ", register_nr);
         printf("%s %s\n", 
-            root->children[0]->lexinfo->c_str(),
-            root->lexinfo->c_str());
+            root->lexinfo->c_str(),
+            root->children[0]->lexinfo->c_str());
     } else { // Else keep traversing
         emit_expr(root->children[0]);
         printf("\t  $t%d:i = %s $t%d:i\n",
@@ -332,8 +342,6 @@ void emit_unary_expr(astree* root) {
             register_nr);
         register_nr++;
     }
-
-    // cout << "unimpl emit_unary_e xpr(), symbol lex: " << root->lexinfo->c_str() << endl;
 }
 
 //Generate global variable code
