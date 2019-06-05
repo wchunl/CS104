@@ -139,6 +139,7 @@ void emit_block(astree* root){
                 emit_while( child);
                 while_nr++;
                 break;
+            case TOK_BLOCK  : emit_block(child); break;
             default: emit_expr(child);
         }
     }
@@ -149,6 +150,7 @@ void emit_call(astree* root) {
     if (root->children.size() > 1) {
         // If call args are not simple
         if(root->children[1]->children.size() > 0) {
+            // If multi args?
             emit_expr(root->children[1]);
             printf("\t  %s($t%d:i)\n", 
                 root->children[0]->lexinfo->c_str(),
@@ -221,31 +223,24 @@ void emit_if(astree* root) {
 
 }
 
+// Generate code for while, need to rewrite (test 23)
 void emit_while(astree* root){
-    //while statement
-    if(root->children[0]->children[0]->symbol == TOK_INDEX){
-        // when there's array elments in while using alloc???
-        
-        // printf("%s%d:%14s%d:%s = %s %s %s\n",".wh",while_nr,"$t",
-        // register_nr,root->children[0]->children[0]->lexinfo->c_str(),
-        // root->children[0]->children[0]->lexinfo->c_str(),
-        // root->children[0]->lexinfo->c_str(),
-        // root->children[0]->children[1]->lexinfo->c_str());
-        printf(".wh%d:", while_nr);
-        emit_expr(root->children[0]);
-    }else{
-        printf(".wh%d:", while_nr);
-        emit_expr(root->children[0]);
-    }
+    // Print while label
+    printf(".wh%d:", while_nr);
+
+    // Generate expression for boolean
+    emit_expr(root->children[0]);
+
+    // Print goto if not...
     printf("\t  goto .od%d if not $t%d:i\n",
         while_nr, register_nr);
 
-    //create do, call emit_block
+    // If there is a block, call it
     if(root->children[1]->symbol == TOK_BLOCK){
-        printf("%s%d:",".do",while_nr);
+        printf(".do%d:", while_nr);
         emit_block(root->children[1]);
     }else{
-        printf("%s%d:",".do",while_nr);
+        printf(".do%d:", while_nr);
         emit_expr(root->children[1]);
     }
 
@@ -269,6 +264,7 @@ void emit_expr(astree* root){
         case TOK_LE         : // fallthrough
         case '>'            : // fallthrough
         case TOK_NE         : // fallthrough
+        case TOK_EQ         : // fallthrough
         case TOK_GE         : emit_bin_expr(root);    break;
         case TOK_NOT        : emit_unary_expr(root);  break;
         case TOK_VARDECL    : emit_asg_expr(root, 1); break;
@@ -320,7 +316,22 @@ void emit_bin_expr(astree* root) {
 
 // Generate unary expression code
 void emit_unary_expr(astree* root) {
-    cout << "unimpl emit_unary_expr(), symbol lex: " << root->lexinfo->c_str() << endl;
+    // If reached deepest node
+    if(root->children[0]->children.size() == 0) {
+        printf("\t  $t%d:i = ", register_nr);
+        printf("%s %s\n", 
+            root->children[0]->lexinfo->c_str(),
+            root->lexinfo->c_str());
+    } else { // Else keep traversing
+        emit_expr(root->children[0]);
+        printf("\t  $t%d:i = %s $t%d:i\n",
+            register_nr + 1, 
+            root->lexinfo->c_str(),
+            register_nr);
+        register_nr++;
+    }
+
+    // cout << "unimpl emit_unary_e xpr(), symbol lex: " << root->lexinfo->c_str() << endl;
 }
 
 //Generate global variable code
