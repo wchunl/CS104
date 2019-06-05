@@ -102,9 +102,11 @@ void emit_local_vars(astree* root) {
         if (child->symbol == TOK_VARDECL) {
             // Print identifier and type
             if(child->children[0]->symbol == TOK_INT){
-                printf("\t  .local int %s\n", child->children[1]->lexinfo->c_str());
+                printf("\t  .local int %s\n", 
+                    child->children[1]->lexinfo->c_str());
             }else{
-                printf("\t  .local ptr %s\n", child->children[1]->lexinfo->c_str());  
+                printf("\t  .local ptr %s\n", 
+                    child->children[1]->lexinfo->c_str());  
             }
         }
     }
@@ -269,6 +271,7 @@ void emit_expr(astree* root){
         case TOK_LE         : // fallthrough
         case '>'            : // fallthrough
         case TOK_NE         : // fallthrough
+        case TOK_EQ         : // fallthrough
         case TOK_GE         : emit_bin_expr(root);    break;
         case TOK_NOT        : emit_unary_expr(root);  break;
         case TOK_VARDECL    : emit_asg_expr(root, 1); break;
@@ -320,7 +323,8 @@ void emit_bin_expr(astree* root) {
 
 // Generate unary expression code
 void emit_unary_expr(astree* root) {
-    cout << "unimpl emit_unary_expr(), symbol lex: " << root->lexinfo->c_str() << endl;
+    cout << "unimpl emit_unary_expr(), symbol lex: " 
+    << root->lexinfo->c_str() << endl;
 }
 
 //Generate global variable code
@@ -339,3 +343,4 @@ void emit_global_vars(astree* root){
         root->children[2]->lexinfo->c_str());
     }
 }
+
