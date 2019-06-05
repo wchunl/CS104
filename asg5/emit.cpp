@@ -13,7 +13,7 @@
 
 using namespace std;
 
-unordered_map<const char*, int> regis;
+// unordered_map<const char*, int> regis;
 
 FILE* emit_file;
 int while_nr = 0;
@@ -66,12 +66,6 @@ void emit_struct(astree* root){
 void emit_function(astree* root){
     for(auto* child: root->children){
         switch(child->symbol){
-            case TOK_BLOCK:
-                emit_block(child);
-                break;
-            case TOK_PARAM:
-                emit_param(child);
-                break;
             case TOK_TYPE_ID:
                 if(child->children[0]->symbol == TOK_STRING){
                     printf("%s:\t  .function ptr\n",
@@ -83,9 +77,31 @@ void emit_function(astree* root){
                         child->children[1]->lexinfo->c_str()));
                 }
                 break;
+            case TOK_PARAM:
+                emit_param(child);
+                break;
+            case TOK_BLOCK:
+                emit_local_vars(child);
+                emit_block(child);
+                break;
         }
     }
      printf("\t  %s\n",".end");
+}
+
+// Need to emit the var_decl inside the block node in function first,
+// then we can parse the actual expression to see if it is simple or not
+void emit_local_vars(astree* root) {
+    for(auto* child: root->children) {
+        if (child->symbol == TOK_VARDECL) {
+            // Print identifier and type
+            if(child->children[0]->symbol == TOK_INT){
+                printf("\t  .local int %s\n", child->children[1]->lexinfo->c_str());
+            }else{
+                printf("\t  .local ptr %s\n", child->children[1]->lexinfo->c_str());  
+            }
+        }
+    }
 }
 
 //not done because of struct IDENT
@@ -101,31 +117,14 @@ void emit_param(astree* root){
     }
 }
 
+// TOK_VARDECL and expressions checked in emit_expr()
 void emit_block(astree* root){
     for(auto* child: root->children){
         switch(child->symbol){
-            case TOK_VARDECL:
-                // Print identifier and type
-                if(child->children[0]->symbol == TOK_INT){
-                    printf("\t  .local int %s\n", child->children[1]->lexinfo->c_str());
-                }else{
-                   printf("\t  .local ptr %s\n", child->children[1]->lexinfo->c_str());  
-                }
-
-                // Insert varaible into register map
-                regis.insert({child->children[1]->lexinfo->c_str(), register_nr});
-                register_nr++;
-
-                // if (child->children[2]->symbol == '+') {
-                //     emit_asg(child);
-                // }
-                // debug_regis();
-                break;
             case TOK_RETURN : 
                 printf("\t  return %s\n",child->children[0]->lexinfo->c_str());
                 printf("\t  return \n");
                 break;
-            // case '=' : 
             case TOK_CALL   : break;
             case TOK_IF     : //fallthrough
             case TOK_IFELSE : emit_if(child); break;
@@ -139,7 +138,7 @@ void emit_block(astree* root){
 }
 
 void emit_if(astree* root) {
-    //unimpl
+    cout << "unimpl if with lexinfo: " << root->lexinfo << endl;
 }
 
 void emit_while(astree* root){
@@ -152,19 +151,11 @@ void emit_while(astree* root){
         // root->children[0]->lexinfo->c_str(),
         // root->children[0]->children[1]->lexinfo->c_str());
     }else{
-        printf("%s%d:\t  %s%d:i = ",".wh",while_nr,"$t",
-            get_reg_nr(root->children[0]->children[0]->lexinfo->c_str()));
-        emit_bin_expr(root->children[0]);
-        printf("\n");
-            // root->children[0]->children[0]->lexinfo->c_str(),
-            // root->children[0]->children[0]->lexinfo->c_str(),
-            // root->children[0]->lexinfo->c_str(),
-            // root->children[0]->children[1]->lexinfo->c_str());
+        printf(".wh%d:", while_nr);
+        emit_expr(root->children[0]);
     }
-    printf("\t  goto .od%d if not $t%d:i\n",while_nr,
-        get_reg_nr(root->children[0]->children[0]->lexinfo->c_str()));
-        // root->children[0]->children[0]->lexinfo->c_str());
-    // register_nr++;
+    printf("\t  goto .od%d if not $t%d:i\n",
+        while_nr, register_nr);
 
     //create do, call emit_block
     if(root->children[1]->symbol == TOK_BLOCK){
@@ -175,54 +166,79 @@ void emit_while(astree* root){
     printf(".od%d:", while_nr);
 }
 
+
+///////////////////////////////////
+////        EXPRESSIONS        ////
+///////////////////////////////////
+
 // Read a node if it is an expression
 void emit_expr(astree* root){
     switch(root->symbol) {
-        case '=' : {//assignment
-            int regnr =  get_reg_nr(root->children[0]->lexinfo->c_str());
-            if (regnr != -1) printf("\t  %s%s%d:i = ", "", "$t", regnr);
-            // else printf("ERROR: could not find symbol, ignoring \n");
-
-            emit_bin_expr(root->children[1]);
-            printf("\n");
+        case '+'            : // fallthrough
+        case '-'            : // fallthrough
+        case '/'            : // fallthrough
+        case '*'            : // fallthrough
+        case '%'            : // fallthrough
+        case '<'            : // fallthrough
+        case TOK_LE         : // fallthrough
+        case '>'            : // fallthrough
+        case TOK_GE         : emit_bin_expr(root); break;
+        case TOK_NOT        : emit_unary_expr(root); break;
+        case TOK_VARDECL    : {//assignment
+            // If node is not nested
+            if(root->children[2]->children.size() == 0) {
+                printf("\t  %s = %s\n",
+                    root->children[1]->lexinfo->c_str(),
+                    root->children[2]->lexinfo->c_str());
+            } else { // If node is nested, traverse it
+                emit_expr(root->children[2]);
+                printf("\t  %s = $t%d:i\n", 
+                    root->children[1]->lexinfo->c_str(), 
+                    register_nr++);
+                // Increment register number
+            }
             break;}
-        case '+'        : // fallthrough
-        case '-'        : // fallthrough
-        case '/'        : // fallthrough
-        case '*'        : // fallthrough
-        case '<'        : // fallthrough
-        case '%'        : // fallthrough
-        case TOK_LE     : // fallthrough
-        case '>'        : // fallthrough
-        case TOK_GE     : emit_bin_expr(root);
-        default: break;
+
+        case '='            : {//assignment
+            // If node is not nested
+            if(root->children[1]->children.size() == 0) {
+                printf("\t  %s = %s\n",
+                    root->children[0]->lexinfo->c_str(),
+                    root->children[1]->lexinfo->c_str());
+            } else { // If node is nested, traverse it
+                emit_expr(root->children[1]);
+                printf("\t  %s = $t%d:i\n", 
+                    root->children[0]->lexinfo->c_str(), 
+                    register_nr++);
+                // Increment register number
+            }
+            break;}
+        case TOK_IDENT      : // fallthrough
+        case TOK_INTCON     : // fallthrough
+        case TOK_STRINGCON  : // fallthrough
+        case TOK_NULLPTR    :
+            printf("%s", root->lexinfo->c_str()); 
+            break;
     }
 }
 
 // Generate binary expression code
-void emit_bin_expr(astree*root) {
-    if (root->children.size() == 2) {
-        // Inorder traversal
-        emit_bin_expr(root->children[0]);
-        printf("%s ", root->lexinfo->c_str());
-        emit_bin_expr(root->children[1]);
-    } else {
-        printf("%s ", root->lexinfo->c_str());
+void emit_bin_expr(astree* root) {
+
+    // If reached deepest node
+    if(root->children[0]->children.size() == 0) {
+        printf("\t  $t%d:i = ", register_nr);
+        printf("%s %s %s\n", 
+            root->children[0]->lexinfo->c_str(),
+            root->lexinfo->c_str(),
+            root->children[1]->lexinfo->c_str());
+    } else { // Else keep traversing
+        emit_expr(root->children[0]);
     }
+
 }
 
-int get_reg_nr(const char* key) {
-    auto i = regis.find(key);
-    if (i != regis.end()) {
-        return i->second;
-    } else {
-        return -1;
-    }
-}
-
-void debug_regis() {
-    cout << "\n------ debugging regis -------\n";
-    for (auto const& pair: regis) {
-        printf("name: %-10s | regis_nr: %d\n", pair.first,pair.second);
-    }
+// Generate unary expression code
+void emit_unary_expr(astree* root) {
+    cout << "unimpl emit_unary_expr(), symbol lex: " << root->lexinfo->c_str() << endl;
 }
