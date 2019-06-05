@@ -125,7 +125,7 @@ void emit_block(astree* root){
                 printf("\t  return %s\n",child->children[0]->lexinfo->c_str());
                 printf("\t  return \n");
                 break;
-            case TOK_CALL   : break;
+            case TOK_CALL   : emit_call(child); break;
             case TOK_IF     : //fallthrough
             case TOK_IFELSE : emit_if(child); break;
             case TOK_WHILE  : 
@@ -134,6 +134,26 @@ void emit_block(astree* root){
                 break;
             default: emit_expr(child);
         }
+    }
+}
+
+void emit_call(astree* root) {
+    // If call has args
+    if (root->children.size() > 1) {
+        // If call args are not simple
+        if(root->children[1]->children.size() > 0) {
+            emit_expr(root->children[1]);
+            printf("\t  %s($t%d:i)\n", 
+                root->children[0]->lexinfo->c_str(),
+                register_nr++);
+        } else { // If is simple
+            printf("\t  %s(%s)\n", 
+                root->children[0]->lexinfo->c_str(),
+                root->children[1]->lexinfo->c_str());
+        }
+    } else { // If no args provided
+        printf("\t  %s()\n", 
+            root->children[0]->lexinfo->c_str());
     }
 }
 
@@ -182,43 +202,36 @@ void emit_expr(astree* root){
         case '<'            : // fallthrough
         case TOK_LE         : // fallthrough
         case '>'            : // fallthrough
-        case TOK_GE         : emit_bin_expr(root); break;
-        case TOK_NOT        : emit_unary_expr(root); break;
-        case TOK_VARDECL    : {//assignment
-            // If node is not nested
-            if(root->children[2]->children.size() == 0) {
-                printf("\t  %s = %s\n",
-                    root->children[1]->lexinfo->c_str(),
-                    root->children[2]->lexinfo->c_str());
-            } else { // If node is nested, traverse it
-                emit_expr(root->children[2]);
-                printf("\t  %s = $t%d:i\n", 
-                    root->children[1]->lexinfo->c_str(), 
-                    register_nr++);
-                // Increment register number
-            }
-            break;}
-
-        case '='            : {//assignment
-            // If node is not nested
-            if(root->children[1]->children.size() == 0) {
-                printf("\t  %s = %s\n",
-                    root->children[0]->lexinfo->c_str(),
-                    root->children[1]->lexinfo->c_str());
-            } else { // If node is nested, traverse it
-                emit_expr(root->children[1]);
-                printf("\t  %s = $t%d:i\n", 
-                    root->children[0]->lexinfo->c_str(), 
-                    register_nr++);
-                // Increment register number
-            }
-            break;}
+        case TOK_GE         : emit_bin_expr(root);    break;
+        case TOK_NOT        : emit_unary_expr(root);  break;
+        case TOK_VARDECL    : emit_asg_expr(root, 1); break;
+        case '='            : emit_asg_expr(root, 0); break;
         case TOK_IDENT      : // fallthrough
         case TOK_INTCON     : // fallthrough
         case TOK_STRINGCON  : // fallthrough
         case TOK_NULLPTR    :
             printf("%s", root->lexinfo->c_str()); 
             break;
+        case TOK_ARROW      : break; //unimpl, refer to 6.2
+        case TOK_CALL       : break; //unimpl, refer to 6.3 2nd paragraph
+    }
+}
+
+// Generate code for an assignment expression ("=" or vardecl)
+// start is the number of the node to start from
+// start for vardecl is 1 and for "=" it is 0
+void emit_asg_expr(astree*root, int start) {
+    // If node is not nested
+    if(root->children[start+1]->children.size() == 0) {
+        printf("\t  %s = %s\n",
+            root->children[start]->lexinfo->c_str(),
+            root->children[start+1]->lexinfo->c_str());
+    } else { // If node is nested, traverse it
+        emit_expr(root->children[start+1]);
+        printf("\t  %s = $t%d:i\n", 
+            root->children[start]->lexinfo->c_str(), 
+            register_nr++);
+        // Increment register number
     }
 }
 
