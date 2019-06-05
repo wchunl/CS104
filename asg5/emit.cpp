@@ -196,30 +196,37 @@ void emit_if(astree* root) {
         emit_expr(root->children[1]);
         printf("\t  goto .fi%d\n",if_nr);
     }
-    printf(".fi%d:", if_nr);
+    printf(".fi%d:\n", if_nr);
     if_nr++;
+  
 
     for(auto* child: root->children){
             switch(child->symbol){
                 case TOK_IFELSE:
                     if(child->children.size() > 2){
+                        else_nr=if_nr-1;
                         printf("\t  goto .el%d if not $t%d:i\n",
                           else_nr, register_nr);
                         printf(".el%d:\n", else_nr);
-                        else_nr++;
+                        //else_nr++;
                         // emit_expr(root->children[0]);
                         emit_if(child);
                     }else{
+                        else_nr=if_nr-1;
                         printf("\t  goto .el%d if not $t%d:i\n",
                           else_nr, register_nr);
                         printf(".el%d:\n", else_nr);
-                        else_nr++;
+                        emit_expr(child);
+                        //else_nr++;
                     }
                     break;
+                // case TOK_IF:
+                //     emit_if(child);
                 default:
                     break;
             }  
     }
+   
     
     
 
@@ -278,7 +285,8 @@ void emit_expr(astree* root){
             printf("%s", root->lexinfo->c_str()); 
             break;
         case TOK_ARROW      : break; //unimpl, refer to 6.2
-        case TOK_CALL       : break; //unimpl, refer to 6.3 2nd paragraph
+        //unimpl, refer to 6.3 2nd paragraph
+        case TOK_CALL       : break; 
     }
 }
 
@@ -333,7 +341,8 @@ void emit_unary_expr(astree* root) {
         register_nr++;
     }
 
-    // cout << "unimpl emit_unary_e xpr(), symbol lex: " << root->lexinfo->c_str() << endl;
+    // cout << "unimpl emit_unary_e xpr(), 
+    //symbol lex: " << root->lexinfo->c_str() << endl;
 }
 
 //Generate global variable code
