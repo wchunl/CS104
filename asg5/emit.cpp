@@ -102,9 +102,11 @@ void emit_local_vars(astree* root) {
         if (child->symbol == TOK_VARDECL) {
             // Print identifier and type
             if(child->children[0]->symbol == TOK_INT){
-                printf("\t  .local int %s\n", child->children[1]->lexinfo->c_str());
+                printf("\t  .local int %s\n", 
+                    child->children[1]->lexinfo->c_str());
             }else{
-                printf("\t  .local ptr %s\n", child->children[1]->lexinfo->c_str());  
+                printf("\t  .local ptr %s\n", 
+                    child->children[1]->lexinfo->c_str());  
             }
         }
     }
@@ -350,3 +352,4 @@ void emit_global_vars(astree* root){
         root->children[2]->lexinfo->c_str());
     }
 }
+
