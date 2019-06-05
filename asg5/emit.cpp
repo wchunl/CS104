@@ -20,6 +20,7 @@ int while_nr = 0;
 int if_nr = 0;
 int else_nr = 0;
 int register_nr = 0;
+int string_nr = 0;
 
 void emit(FILE* outfile, astree* root, int depth){
     emit_file = outfile;
@@ -34,7 +35,8 @@ void emit(FILE* outfile, astree* root, int depth){
             emit_function(root);
             break;
         case TOK_VARDECL:
-            printf("I'm TOK_VARDECL \n");
+        //    printf("I'm TOK_VARDECL \n");
+            emit_global_vars(root);
             break;
         default : 
             for (astree* child: root->children) 
@@ -45,7 +47,7 @@ void emit(FILE* outfile, astree* root, int depth){
 
 // still need one case for type struct IDENT
 void emit_struct(astree* root){
-    for(auto *field: root->children){
+    for(auto* field: root->children){
         switch(field->symbol){
             case TOK_IDENT:
                 printf("%-9s%3s\n",".struct:",field->lexinfo->c_str());
@@ -67,12 +69,16 @@ void emit_function(astree* root){
     for(auto* child: root->children){
         switch(child->symbol){
             case TOK_TYPE_ID:
-                if(child->children[0]->symbol == TOK_STRING){
-                    printf("%s:\t  .function ptr\n",
+                if(child->children[0]->symbol == TOK_VOID){
+                    printf("%s:\t  .function\n",
+                        const_cast<char*>(
+                        child->children[1]->lexinfo->c_str()));
+                }else if(child->children[0]->symbol == TOK_INT){
+                    printf("%s:\t  .function int\n",
                         const_cast<char*>(
                         child->children[1]->lexinfo->c_str()));
                 }else{
-                    printf("%s:\t  .function int\n",
+                     printf("%s:\t  .function\n",
                         const_cast<char*>(
                         child->children[1]->lexinfo->c_str()));
                 }
@@ -122,7 +128,8 @@ void emit_block(astree* root){
     for(auto* child: root->children){
         switch(child->symbol){
             case TOK_RETURN : 
-                printf("\t  return %s\n",child->children[0]->lexinfo->c_str());
+                printf("\t  return %s\n",
+                child->children[0]->lexinfo->c_str());
                 printf("\t  return \n");
                 break;
             case TOK_CALL   : emit_call(child); break;
@@ -158,18 +165,74 @@ void emit_call(astree* root) {
 }
 
 void emit_if(astree* root) {
-    cout << "unimpl if with lexinfo: " << root->lexinfo << endl;
+   // cout << "unimpl if with lexinfo: " << root->lexinfo << endl;
+    //while statement
+    if(root->children[0]->children[0]->symbol == TOK_INDEX){
+        // when there's array elments in while using alloc???
+        
+        // printf("%s%d:%14s%d:%s = %s %s %s\n",".wh",while_nr,"$t",
+        // register_nr,root->children[0]->children[0]->lexinfo->c_str(),
+        // root->children[0]->children[0]->lexinfo->c_str(),
+        // root->children[0]->lexinfo->c_str(),
+        // root->children[0]->children[1]->lexinfo->c_str());
+        printf(".if%d:", if_nr);
+        emit_expr(root->children[0]);
+    }else{
+        printf(".if%d:", if_nr);
+        emit_expr(root->children[0]);
+    }
+    
+    //create th, call emit_block
+    if(root->children[1]->symbol == TOK_BLOCK){
+        printf("%s%d:",".th",if_nr);
+        emit_block(root->children[1]);
+        printf("\t  goto .fi%d\n",if_nr);
+    }else{// when only one line after if
+        printf("%s%d:",".th",if_nr);
+        emit_expr(root->children[1]);
+        printf("\t  goto .fi%d\n",if_nr);
+    }
+    printf(".fi%d:", if_nr);
+    if_nr++;
+
+    for(auto* child: root->children){
+            switch(child->symbol){
+                case TOK_IFELSE:
+                    if(child->children.size() > 2){
+                        printf("\t  goto .el%d if not $t%d:i\n",
+                          else_nr, register_nr);
+                        printf(".el%d:\n", else_nr);
+                        else_nr++;
+                        // emit_expr(root->children[0]);
+                        emit_if(child);
+                    }else{
+                        printf("\t  goto .el%d if not $t%d:i\n",
+                          else_nr, register_nr);
+                        printf(".el%d:\n", else_nr);
+                        else_nr++;
+                    }
+                    break;
+                default:
+                    break;
+            }  
+    }
+    
+    
+
 }
 
 void emit_while(astree* root){
     //while statement
     if(root->children[0]->children[0]->symbol == TOK_INDEX){
         // when there's array elments in while using alloc???
+        
         // printf("%s%d:%14s%d:%s = %s %s %s\n",".wh",while_nr,"$t",
         // register_nr,root->children[0]->children[0]->lexinfo->c_str(),
         // root->children[0]->children[0]->lexinfo->c_str(),
         // root->children[0]->lexinfo->c_str(),
         // root->children[0]->children[1]->lexinfo->c_str());
+        printf(".wh%d:", while_nr);
+        emit_expr(root->children[0]);
     }else{
         printf(".wh%d:", while_nr);
         emit_expr(root->children[0]);
@@ -181,6 +244,9 @@ void emit_while(astree* root){
     if(root->children[1]->symbol == TOK_BLOCK){
         printf("%s%d:",".do",while_nr);
         emit_block(root->children[1]);
+    }else{
+        printf("%s%d:",".do",while_nr);
+        emit_expr(root->children[1]);
     }
 
     printf(".od%d:", while_nr);
@@ -202,6 +268,7 @@ void emit_expr(astree* root){
         case '<'            : // fallthrough
         case TOK_LE         : // fallthrough
         case '>'            : // fallthrough
+        case TOK_NE         : // fallthrough
         case TOK_GE         : emit_bin_expr(root);    break;
         case TOK_NOT        : emit_unary_expr(root);  break;
         case TOK_VARDECL    : emit_asg_expr(root, 1); break;
@@ -254,4 +321,21 @@ void emit_bin_expr(astree* root) {
 // Generate unary expression code
 void emit_unary_expr(astree* root) {
     cout << "unimpl emit_unary_expr(), symbol lex: " << root->lexinfo->c_str() << endl;
+}
+
+//Generate global variable code
+void emit_global_vars(astree* root){
+    if(root->children[0]->symbol == TOK_INT){
+        printf("%s:\t  .global int %s\n",
+         root->children[1]->lexinfo->c_str()
+         ,root->children[2]->lexinfo->c_str());
+    }else if(root->children[0]->symbol == TOK_STRING){
+        printf(".s%d:\t  \"%s\"\n", 
+        string_nr,root->children[2]->lexinfo->c_str());
+        string_nr++;
+    }else{
+        printf("%s:\t  .global ptr %s\n", 
+        root->children[1]->lexinfo->c_str(),
+        root->children[2]->lexinfo->c_str());
+    }
 }
