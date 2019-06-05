@@ -15,6 +15,7 @@ void emit_if(astree* root);
 void emit_function(astree*root);
 void emit_param(astree* root);
 void emit_local_vars(astree* root);
+void emit_global_vars(astree* root);
 
 // Expressions
 void emit_expr(astree* root);
