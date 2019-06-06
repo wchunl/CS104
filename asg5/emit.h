@@ -25,6 +25,9 @@ void emit_expr(astree* root);
 void emit_asg_expr(astree*root, int start);
 void emit_bin_expr(astree*root);
 void emit_unary_expr(astree*root);
+void emit_array_expr(astree*root);
+void emit_alloc_expr(astree* root);
+void emit_arrow_expr(astree* root);
 
 // Other
 void plbl();
