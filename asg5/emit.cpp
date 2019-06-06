@@ -260,7 +260,9 @@ void emit_expr(astree* root){
         case TOK_INTCON     : // fallthrough
         case TOK_STRINGCON  : // fallthrough
         case TOK_NULLPTR    :
-            printf("\t  %s\n", root->lexinfo->c_str()); lbl = false;
+            printf("\t  $t%d:i = %s\n", 
+                register_nr,
+                root->lexinfo->c_str()); lbl = false;
             break;
         case TOK_CALL       : emit_call(root); break; 
         case TOK_ARROW      : emit_arrow_expr(root); break; //refer to 6.2
@@ -331,11 +333,36 @@ void emit_bin_expr(astree* root) {
 
     // If reached deepest node
     if(last->children.size() == 0) {
-        printf("\t  $t%d:i = ", register_nr);
-        printf("%s %s %s\n", 
+        // If left is an array
+        if (root->children[0]->symbol == TOK_INDEX) {
+            printf("\t  $t%d:i = %s[%s * :p]\n",
+                register_nr++,
+                root->children[0]->children[0]->lexinfo->c_str(),
+                root->children[0]->children[1]->lexinfo->c_str());
+            printf("\t  $t%d:i = $t%d:i %s %s\n", 
+                register_nr,
+                register_nr - 1,
+                root->lexinfo->c_str(),
+                root->children[1]->lexinfo->c_str()); lbl = false;
+        // If left is a pointer
+        } else if (root->children[0]->symbol == TOK_ARROW) {
+            printf("\t  $t%d:p = %s->%s.%s\n", 
+                register_nr++,
+                root->children[0]->children[0]->lexinfo->c_str(),
+                "STRUCT_NAME_UNIMPL",
+                root->children[0]->children[1]->lexinfo->c_str());
+            printf("\t  $t%d:i = $t%d:i %s %s\n", 
+                register_nr,
+                register_nr - 1,
+                root->lexinfo->c_str(),
+                root->children[1]->lexinfo->c_str()); lbl = false;
+        } else {
+        printf("\t  $t%d:i = %s %s %s\n", 
+            register_nr,
             root->children[0]->lexinfo->c_str(),
             root->lexinfo->c_str(),
             root->children[1]->lexinfo->c_str()); lbl = false;
+        }
     } else { // Else keep traversing
         emit_expr(last);
         printf("\t  $t%d:i = $t%d:i %s %s\n",
@@ -351,8 +378,8 @@ void emit_bin_expr(astree* root) {
 void emit_unary_expr(astree* root) {
     // If reached deepest node
     if(root->children[0]->children.size() == 0) {
-        printf("\t  $t%d:i = ", register_nr);
-        printf("%s %s\n", 
+        printf("\t  $t%d:i = %s %s\n", 
+            register_nr,
             root->lexinfo->c_str(),
             root->children[0]->lexinfo->c_str()); lbl = false;
     } else { // Else keep traversing
