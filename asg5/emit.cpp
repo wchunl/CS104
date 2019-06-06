@@ -175,9 +175,11 @@ void emit_if(astree* root) {
     if(root->children[1]->symbol == TOK_BLOCK){
         plbl(); printf(".th%d:", this_if_nr);
         emit_block(root->children[1]);
+    //    printf("block\n");
     }else{ // Else emit the statement
         plbl(); printf(".th%d:", this_if_nr);
         emit_expr(root->children[1]);
+      //  printf("statement\n");
     }
 
     // If there is a third arg
@@ -371,8 +373,26 @@ void emit_array_expr(astree* root) {
 }
 
 void emit_alloc_expr(astree* root) {
-    printf("unimpl alloc, lexinfo = %s \n",
-        root->lexinfo->c_str());
+//    printf("unimpl alloc, lexinfo = %s \n",
+//    root->lexinfo->c_str());
+    switch(root->children[0]->symbol){
+        case TOK_STRING:
+            printf("\t  malloc(%lu)\n",sizeof(int));
+            break;
+        case TOK_ARRAY:
+            //if array type is int
+            if(strcmp(root->children[1]->lexinfo->c_str(),"int")==0){
+                printf("\t  malloc(4 * sizeof int)\n");
+            }else{
+                printf("\t  malloc(4 * sizeof ptr)\n");
+            }
+            break;
+        case TOK_TYPE_ID://for struct
+            printf("\t  malloc (size of struct %s)\n", root->children[0]->lexinfo->c_str());
+            break;
+
+
+    }
 }
 
 void emit_arrow_expr(astree* root) {
