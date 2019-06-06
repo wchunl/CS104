@@ -13,14 +13,14 @@
 
 using namespace std;
 
-// unordered_map<const char*, int> regis;
-
 FILE* emit_file;
-int while_nr = 0;
-int if_nr = 0;
-int else_nr = 0;
+int while_nr = -1;
+int if_nr = -1;
 int register_nr = 0;
 int string_nr = 0;
+
+// Whether or not a label was already printed previously
+bool lbl = false;
 
 void emit(FILE* outfile, astree* root, int depth){
     emit_file = outfile;
@@ -127,29 +127,26 @@ void emit_param(astree* root){
 
 // TOK_VARDECL and expressions checked in emit_expr()
 void emit_block(astree* root){
-    // Need to check if the first node in this block
-    // generates a label. If it does, print newline
-    if (root->children.size() > 0) {
-        switch(root->children[0]->symbol) {
-            case TOK_IF     : 
-            case TOK_WHILE  : printf("\n");
-        }
-    }
+    // // Need to check if the first node in this block
+    // // generates a label. If it does, print newline
+    // if (root->children.size() > 0) {
+    //     switch(root->children[0]->symbol) {
+    //         case TOK_IF     : 
+    //         case TOK_WHILE  : printf("\n");
+    //     }
+    // }
 
     for(auto* child: root->children){
         switch(child->symbol){
             case TOK_RETURN : 
                 printf("\t  return %s\n",
                 child->children[0]->lexinfo->c_str());
-                printf("\t  return \n");
+                printf("\t  return \n"); lbl = false;
                 break;
             case TOK_CALL   : emit_call(child); break;
-            case TOK_IF     : //fallthrough
-            case TOK_IFELSE : emit_if(child); break;
-            case TOK_WHILE  : 
-                emit_while( child);
-                while_nr++;
-                break;
+            case TOK_IFELSE : // fallthrough
+            case TOK_IF     : if_nr++; emit_if(child); break;
+            case TOK_WHILE  : while_nr++; emit_while(child); break;
             case TOK_BLOCK  : emit_block(child); break;
             default: emit_expr(child);
         }
@@ -165,105 +162,90 @@ void emit_call(astree* root) {
             emit_expr(root->children[1]);
             printf("\t  %s($t%d:i)\n", 
                 root->children[0]->lexinfo->c_str(),
-                register_nr++);
+                register_nr++); lbl = false;
         } else { // If is simple
             printf("\t  %s(%s)\n", 
                 root->children[0]->lexinfo->c_str(),
-                root->children[1]->lexinfo->c_str());
+                root->children[1]->lexinfo->c_str()); lbl = false;
         }
     } else { // If no args provided
         printf("\t  %s()\n", 
-            root->children[0]->lexinfo->c_str());
+            root->children[0]->lexinfo->c_str()); lbl = false;
     }
 }
 
 void emit_if(astree* root) {
-   // cout << "unimpl if with lexinfo: " << root->lexinfo << endl;
-    //while statement
-    if(root->children[0]->children[0]->symbol == TOK_INDEX){
-        // when there's array elments in while using alloc???
-        
-        // printf("%s%d:%14s%d:%s = %s %s %s\n",".wh",while_nr,"$t",
-        // register_nr,root->children[0]->children[0]->lexinfo->c_str(),
-        // root->children[0]->children[0]->lexinfo->c_str(),
-        // root->children[0]->lexinfo->c_str(),
-        // root->children[0]->children[1]->lexinfo->c_str());
-        printf(".if%d:", if_nr);
-        emit_expr(root->children[0]);
-    }else{
-        printf(".if%d:", if_nr);
-        emit_expr(root->children[0]);
-    }
-    
-    //create th, call emit_block
-    if(root->children[1]->symbol == TOK_BLOCK){
-        printf("%s%d:",".th",if_nr);
-        emit_block(root->children[1]);
-        printf("\t  goto .fi%d\n",if_nr);
-    }else{// when only one line after if
-        printf("%s%d:",".th",if_nr);
-        emit_expr(root->children[1]);
-        printf("\t  goto .fi%d\n",if_nr);
-    }
-    printf(".fi%d:\n", if_nr);
-    if_nr++;
-  
+    // Save the if_nr for this if loop
+    int this_if_nr = if_nr;
+    // Print if label
+    plbl(); printf(".if%d:", this_if_nr);
 
-    for(auto* child: root->children){
-            switch(child->symbol){
-                case TOK_IFELSE:
-                    if(child->children.size() > 2){
-                        else_nr=if_nr-1;
-                        printf("\t  goto .el%d if not $t%d:i\n",
-                          else_nr, register_nr);
-                        printf(".el%d:\n", else_nr);
-                        //else_nr++;
-                        // emit_expr(root->children[0]);
-                        emit_if(child);
-                    }else{
-                        else_nr=if_nr-1;
-                        printf("\t  goto .el%d if not $t%d:i\n",
-                          else_nr, register_nr);
-                        printf(".el%d:\n", else_nr);
-                        emit_expr(child);
-                        //else_nr++;
-                    }
-                    break;
-                // case TOK_IF:
-                //     emit_if(child);
-                default:
-                    break;
-            }  
+    // Generate expression for boolean
+    emit_expr(root->children[0]);
+
+    // Print goto if not...
+    printf("\t  goto .el%d if not $t%d:i\n",
+        this_if_nr, register_nr++); lbl = false;
+
+    // If there is a block, emit it
+    if(root->children[1]->symbol == TOK_BLOCK){
+        plbl(); printf(".th%d:", this_if_nr);
+        emit_block(root->children[1]);
+    }else{ // Else emit the statement
+        plbl(); printf(".th%d:", this_if_nr);
+        emit_expr(root->children[1]);
     }
-   
-    
-    
+
+    // If there is a third arg
+    if (root->children.size() == 3) {
+        // Print the else label
+        plbl(); printf(".el%d:", this_if_nr);
+        // Lexinfo of third arg
+        const char* str = root->children[2]->lexinfo->c_str();
+        // Comparing the lexinfo of TOK_IFELSE
+        if (strcmp(str, "if") == 0) { // if arg is an else if
+            if_nr++;
+            emit_if(root->children[2]);
+        } else if (strcmp(str, "(") == 0) { // if arg is a call
+            emit_call(root->children[2]);
+        } else if (strcmp(str, "=") == 0) { // if arg is an asg
+            emit_asg_expr(root->children[2],0);
+        } else if (strcmp(str, "{") == 0) { // if arg is a block
+            emit_block(root->children[2]);
+        }
+    }
+
+    // Print the if end
+    plbl(); printf(".fi%d:", this_if_nr);
 
 }
 
 // Generate code for while, need to rewrite (test 23)
 void emit_while(astree* root){
+    // Save the while_nr for this while loop
+    int this_while_nr = while_nr;
+
     // Print while label
-    printf(".wh%d:", while_nr);
+    plbl(); printf(".wh%d:", this_while_nr);
 
     // Generate expression for boolean
     emit_expr(root->children[0]);
 
     // Print goto if not...
     printf("\t  goto .od%d if not $t%d:i\n",
-        while_nr, register_nr++);
+        this_while_nr, register_nr++); lbl = false;
 
     // If there is a block, emit it
     if(root->children[1]->symbol == TOK_BLOCK){
-        printf(".do%d:", while_nr);
+        plbl(); printf(".do%d:", this_while_nr); 
         emit_block(root->children[1]);
     }else{ // Else emit the statement
-        printf(".do%d:", while_nr);
+        plbl(); printf(".do%d:", this_while_nr);
         emit_expr(root->children[1]);
     }
 
     // Print the while end
-    printf(".od%d:", while_nr);
+    plbl(); printf(".od%d:", this_while_nr);
 }
 
 
@@ -292,11 +274,11 @@ void emit_expr(astree* root){
         case TOK_INTCON     : // fallthrough
         case TOK_STRINGCON  : // fallthrough
         case TOK_NULLPTR    :
-            printf("%s", root->lexinfo->c_str()); 
+            printf("\t  %s\n", root->lexinfo->c_str()); lbl = false;
             break;
         case TOK_ARROW      : break; //unimpl, refer to 6.2
         //unimpl, refer to 6.3 2nd paragraph
-        case TOK_CALL       : break; 
+        case TOK_CALL       : emit_call(root); break; 
     }
 }
 
@@ -308,18 +290,22 @@ void emit_asg_expr(astree*root, int start) {
     if(root->children[start+1]->children.size() == 0) {
         printf("\t  %s = %s\n",
             root->children[start]->lexinfo->c_str(),
-            root->children[start+1]->lexinfo->c_str());
+            root->children[start+1]->lexinfo->c_str()); lbl = false;
     } else { // If node is nested, traverse it
         emit_expr(root->children[start+1]);
         printf("\t  %s = $t%d:i\n", 
             root->children[start]->lexinfo->c_str(), 
-            register_nr++);
+            register_nr++); lbl = false;
         // Increment register number
     }
 }
 
 // Generate binary expression code
 void emit_bin_expr(astree* root) {
+    if(root->children.size() == 1) {
+        emit_unary_expr(root);
+        return;
+    }
 
     // If reached deepest node
     if(root->children[0]->children.size() == 0) {
@@ -327,9 +313,15 @@ void emit_bin_expr(astree* root) {
         printf("%s %s %s\n", 
             root->children[0]->lexinfo->c_str(),
             root->lexinfo->c_str(),
-            root->children[1]->lexinfo->c_str());
+            root->children[1]->lexinfo->c_str()); lbl = false;
     } else { // Else keep traversing
         emit_expr(root->children[0]);
+        printf("\t  $t%d:i = $t%d:i %s %s\n",
+            register_nr + 1, 
+            register_nr,
+            root->lexinfo->c_str(),
+            root->children[1]->lexinfo->c_str()); lbl = false;
+        register_nr++;
     }
 
 }
@@ -341,13 +333,13 @@ void emit_unary_expr(astree* root) {
         printf("\t  $t%d:i = ", register_nr);
         printf("%s %s\n", 
             root->lexinfo->c_str(),
-            root->children[0]->lexinfo->c_str());
+            root->children[0]->lexinfo->c_str()); lbl = false;
     } else { // Else keep traversing
         emit_expr(root->children[0]);
         printf("\t  $t%d:i = %s $t%d:i\n",
             register_nr + 1, 
             root->lexinfo->c_str(),
-            register_nr);
+            register_nr); lbl = false;
         register_nr++;
     }
 }
@@ -357,15 +349,22 @@ void emit_global_vars(astree* root){
     if(root->children[0]->symbol == TOK_INT){
         printf("%s:\t  .global int %s\n",
          root->children[1]->lexinfo->c_str()
-         ,root->children[2]->lexinfo->c_str());
+         ,root->children[2]->lexinfo->c_str()); lbl = false;
     }else if(root->children[0]->symbol == TOK_STRING){
         printf(".s%d:\t  \"%s\"\n", 
         string_nr,root->children[2]->lexinfo->c_str());
-        string_nr++;
+        string_nr++; lbl = false;
     }else{
         printf("%s:\t  .global ptr %s\n", 
         root->children[1]->lexinfo->c_str(),
-        root->children[2]->lexinfo->c_str());
+        root->children[2]->lexinfo->c_str()); lbl = false;
     }
 }
 
+// Called everytime a label is printed.
+// This function ensures that there wont be two labels
+// right after one another by printing a newline between them
+void plbl() {
+    if (lbl) printf("\n");
+    lbl = true;
+}

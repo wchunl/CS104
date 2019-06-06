@@ -26,8 +26,7 @@ void emit_asg_expr(astree*root, int start);
 void emit_bin_expr(astree*root);
 void emit_unary_expr(astree*root);
 
-// // Other
-// int get_reg_nr(const char* key);
-// void debug_regis();
+// Other
+void plbl();
 
 #endif
