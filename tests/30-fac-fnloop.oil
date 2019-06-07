@@ -1,0 +1,46 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+fac:      .function int
+          .param int n
+          .local int f
+          f = 1
+.wh0:     $t0:i = n > 1
+          goto .od0 if not $t0:i
+.do0:     $t1:i = f * n
+          f = $t1:i
+          $t2:i = n - 1
+          n = $t2:i
+.od0:     return f
+          return 
+          .end
+main:     .function int
+          .local int n
+          n = 1
+.wh1:     $t3:i = n <= 5
+          goto .od1 if not $t3:i
+.do1:     fac(n)
+          putint($t4:i)
+          putchr('\n')
+          $t5:i = n + 1
+          n = $t5:i
+.od1:     return 0
+          return 
+          .end

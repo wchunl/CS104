@@ -1,0 +1,89 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+          board:.global ptr nullptr
+is_safe:  .function int
+          .param int newcol
+          .local int col
+          .local int diagonal
+          col = 0
+          diagonal = 0
+.wh0:     $t0:i = col < newcol
+          goto .od0 if not $t0:i
+.do0:     
+.if0:     $t1:p = board[newcol * :p]
+          $t2:i = $t1:i == [
+          goto .el0 if not $t2:i
+.th0:     
+.fi0:     $t3:p = board[newcol * :p]
+          $t4:i = $t3:i - [
+          diagonal = $t4:i
+.if1:     $t5:i = col - newcol
+          $t6:i = $t5:i == -
+          goto .el1 if not $t6:i
+.th1:     
+.fi1:     
+.if2:     $t7:i = newcol - col
+          $t8:i = $t7:i == -
+          goto .el2 if not $t8:i
+.th2:     
+.fi2:     $t9:i = col + 1
+          col = $t9:i
+.od0:     return 1
+          return 
+          .end
+printqueens:.function
+          .local int col
+          col = 0
+.wh1:     $t10:i = col < 8
+          goto .od1 if not $t10:i
+.do1:     $t11:i = board[col * :p]
+          $t12:i = $t11:i + '1'
+          putchr($t12:i)
+          $t13:i = col + 1
+          col = $t13:i
+.od1:     putchr('\n')
+          .end
+queens:   .function
+          .param int newcol
+          .local int row
+          row = 0
+.if3:     $t14:i = newcol == 8
+          goto .el3 if not $t14:i
+.th3:     printqueens()
+.el3:     
+.wh2:     $t15:i = row < 8
+          goto .od2 if not $t15:i
+.do2:     board[newcol * :p] = row
+.if4:     is_safe(newcol)
+          goto .el4 if not $t16:i
+.th4:     $t17:i = newcol + 1
+          queens($t17:i)
+.fi4:     $t18:i = row + 1
+          row = $t18:i
+.od2:     
+.fi3:     .end
+main:     .function int
+          malloc(4 * sizeof int)
+          board = $t19:i
+          queens(0)
+          return 0
+          return 
+          .end

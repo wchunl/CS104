@@ -1,0 +1,29 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+main:     .function int
+.if0:     $t0:i = "nullptr" == nullptr
+          $t1:i = not $t0:i
+          goto .el0 if not $t1:i
+.th0:     $t2:i = "\"nullptr\" == nullptr"
+          fail($t2:i)
+.fi0:     return 1
+          return 
+          .end

@@ -31,5 +31,7 @@ void emit_arrow_expr(astree* root);
 
 // Other
 void plbl();
+void pln();
+const char* gsn(const char* key);
 
 #endif

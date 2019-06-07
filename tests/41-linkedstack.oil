@@ -1,0 +1,107 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+          .struct node
+          .field ptr data
+          .field ptr node
+          .end
+          .struct stack
+          .field ptr node
+          .end
+empty:    .function int
+          .param ptr stack
+.if0:     $t0:i = stack != nullptr
+          $t1:i = not $t0:i
+          goto .el0 if not $t1:i
+.th0:     $t2:i = "stack != nullptr"
+          fail($t2:i)
+.fi0:     return ==
+          return 
+          .end
+new_stack:.function
+          .local ptr stack
+          malloc (size of struct stack)
+          stack = $t3:i
+          stack->stack.top = nullptr
+          return stack
+          return 
+          .end
+push:     .function
+          .param ptr stack
+          .param ptr str
+          .local ptr tmp
+          malloc (size of struct node)
+          tmp = $t4:i
+.if1:     $t5:i = stack != nullptr
+          $t6:i = not $t5:i
+          goto .el1 if not $t6:i
+.th1:     $t7:i = "stack != nullptr"
+          fail($t7:i)
+.fi1:     tmp->node.data = str
+          $t8:p = stack->stack.top
+          tmp->node.link = $t8:i
+          stack->stack.top = tmp
+          .end
+pop:      .function
+          .param ptr stack
+          .local ptr tmp
+          $t9:p = ->->null.data
+          tmp = $t9:i
+.if2:     $t10:i = stack != nullptr
+          $t11:i = not $t10:i
+          goto .el2 if not $t11:i
+.th2:     $t12:i = "stack != nullptr"
+          fail($t12:i)
+.fi2:     
+.if3:     empty(stack)
+          $t14:i = not $t13:i
+          $t15:i = not $t14:i
+          goto .el3 if not $t15:i
+.th3:     $t16:i = "not empty (stack)"
+          fail($t16:i)
+.fi3:     $t17:p = ->->null.link
+          stack->stack.top = $t17:i
+          return tmp
+          return 
+          .end
+main:     .function int
+          .param int argc
+          .param ptr argv
+          .local int argi
+          .local ptr stack
+          argi = 0
+          new_stack()
+          stack = $t18:i
+.wh0:     $t19:i = argi < argc
+          goto .od0 if not $t19:i
+.do0:     $t20:i = stack
+          push($t20:i)
+          $t21:i = argi + 1
+          argi = $t21:i
+.od0:     
+.wh1:     empty(stack)
+          $t23:i = not $t22:i
+          goto .od1 if not $t23:i
+.do1:     pop(stack)
+          putstr($t24:i)
+          putchr('\n')
+.od1:     return 0
+          return 
+          .end

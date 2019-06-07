@@ -1,0 +1,77 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+move:     .function
+          .param ptr src
+          .param ptr dst
+          putstr("Move a disk from the ")
+          putstr(src)
+          putstr(" to the ")
+          putstr(dst)
+          putstr(".\n")
+          .end
+towers:   .function
+          .param int ndisks
+          .param ptr src
+          .param ptr tmp
+          .param ptr dst
+.if0:     $t0:i = ndisks < 1
+          goto .el0 if not $t0:i
+.th0:     
+.fi0:     $t1:i = ndisks - 1
+          towers($t1:i)
+          $t2:i = src
+          move($t2:i)
+          $t3:i = ndisks - 1
+          towers($t3:i)
+          .end
+main:     .function int
+          .param int argc
+          .param ptr argv
+          .local int count
+.if1:     $t4:i = argc == 2
+          $t5:i = not $t4:i
+          goto .el1 if not $t5:i
+.th1:     $t6:i = "argc == 2"
+          fail($t6:i)
+.fi1:     $t7:i = [[0 * :p]
+          $t8:i = $t7:i - '0'
+          count = $t8:i
+.if2:     $t9:i = count > 0
+          $t10:i = not $t9:i
+          goto .el2 if not $t10:i
+.th2:     $t11:i = "count > 0"
+          fail($t11:i)
+.fi2:     
+.if3:     $t12:i = count < 9
+          $t13:i = not $t12:i
+          goto .el3 if not $t13:i
+.th3:     $t14:i = "count < 9"
+          fail($t14:i)
+.fi3:     $t15:p = argv[0 * :p]
+          putstr($t15:i)
+          putstr(": ")
+          putint(count)
+          putstr(" disks\n")
+          $t16:i = count
+          towers($t16:i)
+          return 0
+          return 
+          .end

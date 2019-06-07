@@ -87,13 +87,13 @@ ROOT "" (0.0.0)
 |   |   |   |   TOK_STRINGCON ""] compiled "" (7.11.12) string const
 |   |   |   TOK_CALL "(" (7.12.11)
 |   |   |   |   TOK_IDENT "putstr" (7.12.4) variable
-|   |   |   |   TOK_STRINGCON ""May 27 2019"" (7.12.12) string const
+|   |   |   |   TOK_STRINGCON ""Jun  6 2019"" (7.12.12) string const
 |   |   |   TOK_CALL "(" (7.13.11)
 |   |   |   |   TOK_IDENT "putstr" (7.13.4) variable
 |   |   |   |   TOK_STRINGCON "" "" (7.13.12) string const
 |   |   |   TOK_CALL "(" (7.14.11)
 |   |   |   |   TOK_IDENT "putstr" (7.14.4) variable
-|   |   |   |   TOK_STRINGCON ""21:20:55"" (7.14.12) string const
+|   |   |   |   TOK_STRINGCON ""19:07:00"" (7.14.12) string const
 |   |   |   TOK_CALL "(" (7.15.11)
 |   |   |   |   TOK_IDENT "putstr" (7.15.4) variable
 |   |   |   |   TOK_STRINGCON ""\n"" (7.15.12) string const

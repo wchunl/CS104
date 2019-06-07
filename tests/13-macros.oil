@@ -1,0 +1,37 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+main:     .function int
+          .param int argc
+          .param ptr argv
+          $t0:p = argv[0 * :p]
+          putstr($t0:i)
+          putstr(": ")
+          putstr("13-macros.oc")
+          putchr('[')
+          putint(10)
+          putstr("] compiled ")
+          putstr("Jun  6 2019")
+          putstr(" ")
+          putstr("19:07:00")
+          putstr("\n")
+          return 0
+          return 
+          .end

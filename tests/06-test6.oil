@@ -1,0 +1,51 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+          .struct foo
+          .end
+          .struct bar
+          .end
+f0:       .function int
+          .end
+f1:       .function int
+          .param int a
+          .end
+f2:       .function int
+          .param int a
+          .param int b
+          .end
+f3:       .function int
+          .param ptr a
+          .param ptr b
+          .param ptr c
+          .end
+f4:       .function int
+          .param ptr a
+          .param ptr b
+          .end
+main:     .function int
+          .local ptr s
+          .local ptr sa
+          s = "a"
+          malloc(4 * sizeof ptr)
+          sa = $t0:i
+          return 0
+          return 
+          .end

@@ -1,0 +1,40 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+main:     .function int
+          .param int argc
+.if0:     $t0:i = argc == 1
+          goto .el0 if not $t0:i
+.th0:     putstr("one")
+.el0:     
+.if1:     $t1:i = argc == 2
+          goto .el1 if not $t1:i
+.th1:     putstr("two")
+.el1:     
+.if2:     $t2:i = argc == 3
+          goto .el2 if not $t2:i
+.th2:     putstr("three")
+.el2:     putstr("many")
+.fi2:     
+.fi1:     
+.fi0:     putchr('\n')
+          return 0
+          return 
+          .end

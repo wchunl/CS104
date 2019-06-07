@@ -1,0 +1,99 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+          .struct stack
+          .field ptr string
+          .field int size
+          .field int top
+          .end
+new_stack:.function
+          .param int size
+          .local ptr stack
+          malloc (size of struct stack)
+          stack = $t0:i
+          malloc(4 * sizeof ptr)
+          stack->stack.data = $t1:i
+          stack->stack.size = size
+          $t2:i = - 1
+          stack->stack.top = $t2:i
+          return stack
+          return 
+          .end
+push:     .function
+          .param ptr stack
+          .param ptr str
+.if0:     $t3:p = stack->stack.size
+          $t4:i = $t3:i - 1
+          $t5:i = $t4:i < -
+          $t6:i = not $t5:i
+          goto .el0 if not $t6:i
+.th0:     $t7:i = "stack->top < stack->size - 1"
+          fail($t7:i)
+.fi0:     $t8:p = stack->stack.top
+          $t9:i = $t8:i + 1
+          stack->stack.top = $t9:i
+          ->[-> * :p] = str
+          .end
+pop:      .function
+          .param ptr stack
+          .local ptr tmp
+          $t10:p = ->[-> * :p]
+          tmp = $t10:i
+.if1:     $t11:i = - 1
+          $t12:i = $t11:i != -
+          $t13:i = not $t12:i
+          goto .el1 if not $t13:i
+.th1:     $t14:i = "stack->top != EMPTY"
+          fail($t14:i)
+.fi1:     $t15:p = stack->stack.top
+          $t16:i = $t15:i - 1
+          stack->stack.top = $t16:i
+          return tmp
+          return 
+          .end
+empty:    .function int
+          .param ptr stack
+          return ==
+          return 
+          .end
+main:     .function int
+          .param int argc
+          .param ptr argv
+          .local ptr stack
+          .local int argi
+          new_stack(100)
+          stack = $t17:i
+          argi = 0
+.wh0:     $t18:i = argi < argc
+          goto .od0 if not $t18:i
+.do0:     $t19:i = stack
+          push($t19:i)
+          $t20:i = argi + 1
+          argi = $t20:i
+.od0:     
+.wh1:     empty(stack)
+          $t22:i = not $t21:i
+          goto .od1 if not $t22:i
+.do1:     pop(stack)
+          putstr($t23:i)
+          putchr('\n')
+.od1:     return 0
+          return 
+          .end

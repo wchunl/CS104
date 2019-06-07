@@ -13,6 +13,8 @@
 
 using namespace std;
 
+unordered_map<const char*, const char*> structmap;
+
 FILE* emit_file;
 int while_nr = -1;
 int if_nr = -1;
@@ -41,19 +43,20 @@ void emit_struct(astree* root){
     for(auto* field: root->children){
         switch(field->symbol){
             case TOK_IDENT:
-                printf(".struct %s\n", field->lexinfo->c_str());
+                pln(); fprintf(emit_file,".struct %s\n", 
+                    field->lexinfo->c_str());
                 break;
             case TOK_INT:
-                printf(".field int %s\n",
+                pln(); fprintf(emit_file,".field int %s\n",
                     field->children[0]->lexinfo->c_str());
                 break;
             default:
-                printf(".field ptr %s\n",
+                pln(); fprintf(emit_file,".field ptr %s\n",
                     field->children[0]->lexinfo->c_str()); 
                 break;     
         }
     }
-    printf("%s\n",".end");
+    pln(); fprintf(emit_file,"%s\n",".end");
 }
 
 
@@ -61,21 +64,25 @@ void emit_struct(astree* root){
 void emit_function(astree* root){
     for(auto* child: root->children){
         switch(child->symbol){
-            case TOK_TYPE_ID:
+            case TOK_TYPE_ID: {
+                int len = child->children[1]->lexinfo->length();
                 if(child->children[0]->symbol == TOK_VOID){
-                    printf("%s:\t  .function\n",
-                        const_cast<char*>(
-                        child->children[1]->lexinfo->c_str()));
+                    fprintf(emit_file,"%s:",
+                        child->children[1]->lexinfo->c_str());
+                    for(int i=0;i<9-len;i++) fprintf(emit_file," ");
+                    fprintf(emit_file,".function\n");
                 }else if(child->children[0]->symbol == TOK_INT){
-                    printf("%s:\t  .function int\n",
-                        const_cast<char*>(
-                        child->children[1]->lexinfo->c_str()));
+                    fprintf(emit_file,"%s:",
+                        child->children[1]->lexinfo->c_str());
+                    for(int i=0;i<9-len;i++) fprintf(emit_file," ");
+                    fprintf(emit_file,".function int\n");
                 }else{
-                     printf("%s:\t  .function\n",
-                        const_cast<char*>(
-                        child->children[1]->lexinfo->c_str()));
+                    fprintf(emit_file,"%s:",
+                        child->children[1]->lexinfo->c_str());
+                    for(int i=0;i<9-len;i++) fprintf(emit_file," ");
+                    fprintf(emit_file,".function\n");
                 }
-                break;
+                break; }
             case TOK_PARAM:
                 emit_param(child);
                 break;
@@ -85,20 +92,20 @@ void emit_function(astree* root){
                 break;
         }
     }
-     printf("\t  %s\n",".end");
+     pln(); fprintf(emit_file,"%s\n",".end");
 }
 
 // Need to emit the var_decl inside the block node in function first,
-// then we can parse the actual expression to see if it is simple or not
+// then we can parse the actual expr to see if it is simple or not
 void emit_local_vars(astree* root) {
     for(auto* child: root->children) {
         if (child->symbol == TOK_VARDECL) {
             // Print identifier and type
             if(child->children[0]->symbol == TOK_INT){
-                printf("\t  .local int %s\n", 
+                fprintf(emit_file,"%-10s.local int %s\n","",
                     child->children[1]->lexinfo->c_str());
             }else{
-                printf("\t  .local ptr %s\n", 
+                fprintf(emit_file,"%-10s.local ptr %s\n","",
                     child->children[1]->lexinfo->c_str());  
             }
         }
@@ -109,10 +116,10 @@ void emit_local_vars(astree* root) {
 void emit_param(astree* root){
     for(auto* child: root->children){
         if(child->children[0]->symbol == TOK_INT){
-            printf("\t  .param int %s\n",
+            fprintf(emit_file,"%-10s.param int %s\n","",
                 child->children[1]->lexinfo->c_str());
         }else{
-             printf("\t  .param ptr %s\n",
+             fprintf(emit_file,"%-10s.param ptr %s\n","",
                 child->children[1]->lexinfo->c_str());
         }
     }
@@ -123,9 +130,9 @@ void emit_block(astree* root){
     for(auto* child: root->children){
         switch(child->symbol){
             case TOK_RETURN : 
-                printf("\t  return %s\n",
+                pln(); fprintf(emit_file,"return %s\n",
                 child->children[0]->lexinfo->c_str());
-                printf("\t  return \n"); lbl = false;
+                pln(); fprintf(emit_file,"return \n");
                 break;
             case TOK_CALL   : emit_call(child); break;
             case TOK_IFELSE : // fallthrough
@@ -144,17 +151,17 @@ void emit_call(astree* root) {
         if(root->children[1]->children.size() > 0) {
             // If multi args?
             emit_expr(root->children[1]);
-            printf("\t  %s($t%d:i)\n", 
+            pln(); fprintf(emit_file,"%s($t%d:i)\n", 
                 root->children[0]->lexinfo->c_str(),
-                register_nr++); lbl = false;
+                register_nr++);
         } else { // If is simple
-            printf("\t  %s(%s)\n", 
+            pln(); fprintf(emit_file,"%s(%s)\n", 
                 root->children[0]->lexinfo->c_str(),
-                root->children[1]->lexinfo->c_str()); lbl = false;
+                root->children[1]->lexinfo->c_str());
         }
     } else { // If no args provided
-        printf("\t  %s()\n", 
-            root->children[0]->lexinfo->c_str()); lbl = false;
+        pln(); fprintf(emit_file,"%s()\n", 
+            root->children[0]->lexinfo->c_str());
     }
 }
 
@@ -162,30 +169,30 @@ void emit_if(astree* root) {
     // Save the if_nr for this if loop
     int this_if_nr = if_nr;
     // Print if label
-    plbl(); printf(".if%d:", this_if_nr);
+    plbl(); fprintf(emit_file,".if%d:     ", this_if_nr);
 
     // Generate expression for boolean
     emit_expr(root->children[0]);
 
     // Print goto if not...
-    printf("\t  goto .el%d if not $t%d:i\n",
-        this_if_nr, register_nr++); lbl = false;
+    pln(); fprintf(emit_file,"goto .el%d if not $t%d:i\n",
+        this_if_nr, register_nr++);
 
     // If there is a block, emit it
     if(root->children[1]->symbol == TOK_BLOCK){
-        plbl(); printf(".th%d:", this_if_nr);
+        plbl(); fprintf(emit_file,".th%d:     ", this_if_nr);
         emit_block(root->children[1]);
-    //    printf("block\n");
+    //    fprintf(emit_file,"block\n");
     }else{ // Else emit the statement
-        plbl(); printf(".th%d:", this_if_nr);
+        plbl(); fprintf(emit_file,".th%d:     ", this_if_nr);
         emit_expr(root->children[1]);
-      //  printf("statement\n");
+      //  fprintf(emit_file,"statement\n");
     }
 
     // If there is a third arg
     if (root->children.size() == 3) {
         // Print the else label
-        plbl(); printf(".el%d:", this_if_nr);
+        plbl(); fprintf(emit_file,".el%d:     ", this_if_nr);
         // Lexinfo of third arg
         const char* str = root->children[2]->lexinfo->c_str();
         // Comparing the lexinfo of TOK_IFELSE
@@ -202,7 +209,7 @@ void emit_if(astree* root) {
     }
 
     // Print the if end
-    plbl(); printf(".fi%d:", this_if_nr);
+    plbl(); fprintf(emit_file,".fi%d:     ", this_if_nr);
 
 }
 
@@ -212,26 +219,26 @@ void emit_while(astree* root){
     int this_while_nr = while_nr;
 
     // Print while label
-    plbl(); printf(".wh%d:", this_while_nr);
+    plbl(); fprintf(emit_file,".wh%d:     ", this_while_nr);
 
     // Generate expression for boolean
     emit_expr(root->children[0]);
 
     // Print goto if not...
-    printf("\t  goto .od%d if not $t%d:i\n",
-        this_while_nr, register_nr++); lbl = false;
+    pln(); fprintf(emit_file,"goto .od%d if not $t%d:i\n",
+        this_while_nr, register_nr++);
 
     // If there is a block, emit it
     if(root->children[1]->symbol == TOK_BLOCK){
-        plbl(); printf(".do%d:", this_while_nr); 
+        plbl(); fprintf(emit_file,".do%d:     ", this_while_nr); 
         emit_block(root->children[1]);
     }else{ // Else emit the statement
-        plbl(); printf(".do%d:", this_while_nr);
+        plbl(); fprintf(emit_file,".do%d:     ", this_while_nr);
         emit_expr(root->children[1]);
     }
 
     // Print the while end
-    plbl(); printf(".od%d:", this_while_nr);
+    plbl(); fprintf(emit_file,".od%d:     ", this_while_nr);
 }
 
 
@@ -260,13 +267,13 @@ void emit_expr(astree* root){
         case TOK_INTCON     : // fallthrough
         case TOK_STRINGCON  : // fallthrough
         case TOK_NULLPTR    :
-            printf("\t  $t%d:i = %s\n", 
+            pln(); fprintf(emit_file,"$t%d:i = %s\n", 
                 register_nr,
-                root->lexinfo->c_str()); lbl = false;
+                root->lexinfo->c_str());
             break;
         case TOK_CALL       : emit_call(root); break; 
-        case TOK_ARROW      : emit_arrow_expr(root); break; //refer to 6.2
-        case TOK_ALLOC      : emit_alloc_expr(root); break; // refer to 6.5
+        case TOK_ARROW      : emit_arrow_expr(root); break;
+        case TOK_ALLOC      : emit_alloc_expr(root); break;
         case TOK_INDEX      : emit_array_expr(root); break;
     }
 }
@@ -275,46 +282,50 @@ void emit_expr(astree* root){
 // start is the number of the node to start from
 // start for vardecl is 1 and for "=" it is 0
 void emit_asg_expr(astree*root, int start) {
+    if (start == 1 && root->children[0]->symbol == TOK_PTR) {
+        structmap.insert({root->children[1]->lexinfo->c_str(),
+            root->children[0]->children[0]->lexinfo->c_str()});
+    }
     // If node is not nested
     if(root->children[start+1]->children.size() == 0) {
         // If left is an array
         if (root->children[start]->symbol == TOK_INDEX) {
-            printf("\t  %s[%s * :p] = %s\n", 
+            pln(); fprintf(emit_file,"%s[%s * :p] = %s\n", 
                 root->children[start]->children[0]->lexinfo->c_str(),
                 root->children[start]->children[1]->lexinfo->c_str(),
-                root->children[start+1]->lexinfo->c_str());lbl = false;
+                root->children[start+1]->lexinfo->c_str());
         // If left is a pointer
         } else if (root->children[start]->symbol == TOK_ARROW) {
-            printf("\t  %s->%s.%s = %s\n", 
+            pln(); fprintf(emit_file,"%s->%s.%s = %s\n", 
                 root->children[start]->children[0]->lexinfo->c_str(),
-                "STRUCT_NAME_UNIMPL",
+            gsn(root->children[start]->children[0]->lexinfo->c_str()),
                 root->children[start]->children[1]->lexinfo->c_str(),
-                root->children[start+1]->lexinfo->c_str());lbl = false;
+                root->children[start+1]->lexinfo->c_str());
         } else {
-            printf("\t  %s = %s\n",
+            pln(); fprintf(emit_file,"%s = %s\n",
                 root->children[start]->lexinfo->c_str(),
-                root->children[start+1]->lexinfo->c_str()); lbl = false;
+                root->children[start+1]->lexinfo->c_str());
         }
     } else { // If node is nested, traverse it
         // Emit the expression
         emit_expr(root->children[start+1]);
         // If left is an array
         if (root->children[start]->symbol == TOK_INDEX) {
-            printf("\t  %s[%s * :p] = $t%d:i\n", 
+            pln(); fprintf(emit_file,"%s[%s * :p] = $t%d:i\n", 
                 root->children[start]->children[0]->lexinfo->c_str(),
                 root->children[start]->children[1]->lexinfo->c_str(),
-                register_nr++); lbl = false;
+                register_nr++);
         // If left is a pointer
         } else if (root->children[start]->symbol == TOK_ARROW) {
-            printf("\t  %s->%s.%s = $t%d:i\n", 
+            pln(); fprintf(emit_file,"%s->%s.%s = $t%d:i\n", 
                 root->children[start]->children[0]->lexinfo->c_str(),
-                "STRUCT_NAME_UNIMPL",
+            gsn(root->children[start]->children[0]->lexinfo->c_str()),
                 root->children[start]->children[1]->lexinfo->c_str(),
-                register_nr++); lbl = false;
+                register_nr++);
         } else {
-            printf("\t  %s = $t%d:i\n", 
+            pln(); fprintf(emit_file,"%s = $t%d:i\n", 
                 root->children[start]->lexinfo->c_str(), 
-                register_nr++); lbl = false;
+                register_nr++);
         // Increment register number
         }
     }
@@ -335,41 +346,41 @@ void emit_bin_expr(astree* root) {
     if(last->children.size() == 0) {
         // If left is an array
         if (root->children[0]->symbol == TOK_INDEX) {
-            printf("\t  $t%d:i = %s[%s * :p]\n",
+            pln(); fprintf(emit_file,"$t%d:i = %s[%s * :p]\n",
                 register_nr++,
                 root->children[0]->children[0]->lexinfo->c_str(),
                 root->children[0]->children[1]->lexinfo->c_str());
-            printf("\t  $t%d:i = $t%d:i %s %s\n", 
+            pln(); fprintf(emit_file,"$t%d:i = $t%d:i %s %s\n", 
                 register_nr,
                 register_nr - 1,
                 root->lexinfo->c_str(),
-                root->children[1]->lexinfo->c_str()); lbl = false;
+                root->children[1]->lexinfo->c_str());
         // If left is a pointer
         } else if (root->children[0]->symbol == TOK_ARROW) {
-            printf("\t  $t%d:p = %s->%s.%s\n", 
+            pln(); fprintf(emit_file,"$t%d:p = %s->%s.%s\n", 
                 register_nr++,
                 root->children[0]->children[0]->lexinfo->c_str(),
-                "STRUCT_NAME_UNIMPL",
+                gsn(root->children[0]->children[0]->lexinfo->c_str()),
                 root->children[0]->children[1]->lexinfo->c_str());
-            printf("\t  $t%d:i = $t%d:i %s %s\n", 
+            pln(); fprintf(emit_file,"$t%d:i = $t%d:i %s %s\n", 
                 register_nr,
                 register_nr - 1,
                 root->lexinfo->c_str(),
-                root->children[1]->lexinfo->c_str()); lbl = false;
+                root->children[1]->lexinfo->c_str());
         } else {
-        printf("\t  $t%d:i = %s %s %s\n", 
+        pln(); fprintf(emit_file,"$t%d:i = %s %s %s\n", 
             register_nr,
             root->children[0]->lexinfo->c_str(),
             root->lexinfo->c_str(),
-            root->children[1]->lexinfo->c_str()); lbl = false;
+            root->children[1]->lexinfo->c_str());
         }
     } else { // Else keep traversing
         emit_expr(last);
-        printf("\t  $t%d:i = $t%d:i %s %s\n",
+        pln(); fprintf(emit_file,"$t%d:i = $t%d:i %s %s\n",
             register_nr + 1, 
             register_nr,
             root->lexinfo->c_str(),
-            root->children[1]->lexinfo->c_str()); lbl = false;
+            root->children[1]->lexinfo->c_str());
         register_nr++;
     }
 }
@@ -378,72 +389,71 @@ void emit_bin_expr(astree* root) {
 void emit_unary_expr(astree* root) {
     // If reached deepest node
     if(root->children[0]->children.size() == 0) {
-        printf("\t  $t%d:i = %s %s\n", 
+        pln(); fprintf(emit_file,"$t%d:i = %s %s\n", 
             register_nr,
             root->lexinfo->c_str(),
-            root->children[0]->lexinfo->c_str()); lbl = false;
+            root->children[0]->lexinfo->c_str());
     } else { // Else keep traversing
         emit_expr(root->children[0]);
-        printf("\t  $t%d:i = %s $t%d:i\n",
+        pln(); fprintf(emit_file,"$t%d:i = %s $t%d:i\n",
             register_nr + 1, 
             root->lexinfo->c_str(),
-            register_nr); lbl = false;
+            register_nr);
         register_nr++;
     }
 }
 
 void emit_array_expr(astree* root) {
-    printf("\t  $t%d:p = %s[%s * :p]\n",
+    pln(); fprintf(emit_file,"$t%d:p = %s[%s * :p]\n",
         register_nr,
         root->children[0]->lexinfo->c_str(),
-        root->children[1]->lexinfo->c_str()); lbl = false;
+        root->children[1]->lexinfo->c_str());
 }
 
 void emit_alloc_expr(astree* root) {
-//    printf("unimpl alloc, lexinfo = %s \n",
+//    fprintf(emit_file,"unimpl alloc, lexinfo = %s \n",
 //    root->lexinfo->c_str());
     switch(root->children[0]->symbol){
         case TOK_STRING:
-            printf("\t  malloc(%lu)\n",sizeof(int));
+            pln(); fprintf(emit_file,"malloc(%lu)\n",sizeof(int));
             break;
         case TOK_ARRAY:
             //if array type is int
             if(strcmp(root->children[1]->lexinfo->c_str(),"int")==0){
-                printf("\t  malloc(4 * sizeof int)\n");
+                pln(); fprintf(emit_file,"malloc(4 * sizeof int)\n");
             }else{
-                printf("\t  malloc(4 * sizeof ptr)\n");
+                pln(); fprintf(emit_file,"malloc(4 * sizeof ptr)\n");
             }
             break;
         case TOK_TYPE_ID://for struct
-            printf("\t  malloc (size of struct %s)\n", root->children[0]->lexinfo->c_str());
+            pln(); fprintf(emit_file,"malloc (size of struct %s)\n", 
+                root->children[0]->lexinfo->c_str());
             break;
-
-
     }
 }
 
 void emit_arrow_expr(astree* root) {
-    printf("\t  $t%d:p = %s->%s.%s\n",
+    pln(); fprintf(emit_file,"$t%d:p = %s->%s.%s\n",
         register_nr,
         root->children[0]->lexinfo->c_str(),
-        "STUCT_NAME_UNIMPL",
-        root->children[1]->lexinfo->c_str()); lbl = false;
+        gsn(root->children[0]->lexinfo->c_str()),
+        root->children[1]->lexinfo->c_str());
 }
 
 //Generate global variable code
 void emit_global_vars(astree* root){
     if(root->children[0]->symbol == TOK_INT){
-        printf("%s:\t  .global int %s\n",
+        pln(); fprintf(emit_file,"%s:.global int %s\n",
          root->children[1]->lexinfo->c_str()
-         ,root->children[2]->lexinfo->c_str()); lbl = false;
+         ,root->children[2]->lexinfo->c_str());
     }else if(root->children[0]->symbol == TOK_STRING){
-        printf(".s%d:\t  \"%s\"\n", 
+        pln(); fprintf(emit_file,".s%d:\"%s\"\n", 
         string_nr,root->children[2]->lexinfo->c_str());
-        string_nr++; lbl = false;
+        string_nr++;
     }else{
-        printf("%s:\t  .global ptr %s\n", 
+        pln(); fprintf(emit_file,"%s:.global ptr %s\n", 
         root->children[1]->lexinfo->c_str(),
-        root->children[2]->lexinfo->c_str()); lbl = false;
+        root->children[2]->lexinfo->c_str());
     }
 }
 
@@ -451,6 +461,22 @@ void emit_global_vars(astree* root){
 // This function ensures that there wont be two labels
 // right after one another by printing a newline between them
 void plbl() {
-    if (lbl) printf("\n");
+    if (lbl) fprintf(emit_file,"\n");
     lbl = true;
+}
+
+// Called everytime anything other than a label is printed
+// prints 10 spaces if not on same line as a label
+void pln() {
+    if (!lbl) fprintf(emit_file,"%-10s","");
+    lbl = false;
+}
+
+// Retrieves the struct name associated with the given key node
+const char* gsn(const char* key) {
+    auto i = structmap.find(key);
+    if (i != structmap.end()) {
+        return i->second;
+    }
+    return "null";
 }

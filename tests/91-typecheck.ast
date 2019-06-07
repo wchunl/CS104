@@ -75,7 +75,7 @@ ROOT "" (0.0.0)
 |   |   |   '=' "=" (5.28.27) int vreg
 |   |   |   |   TOK_IDENT "b" (5.28.25) variable
 |   |   |   |   TOK_INTCON "4" (5.28.29) int const
-|   TOK_IF "if" (5.29.4)  f
+|   TOK_IF "if" (5.29.4) `ú
 |   |   TOK_EQ "==" (5.29.10) vreg
 |   |   |   TOK_IDENT "a" (5.29.8) int variable (5.12.11)
 |   |   |   TOK_IDENT "b" (5.29.13) variable

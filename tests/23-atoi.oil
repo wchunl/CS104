@@ -1,0 +1,98 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+atoi:     .function int
+          .param ptr str
+          .local int neg
+          .local int num
+          .local int digit
+          neg = 0
+          num = 0
+          digit = 0
+.if0:     $t0:i = str != nullptr
+          $t1:i = not $t0:i
+          goto .el0 if not $t1:i
+.th0:     $t2:i = "str != nullptr"
+          fail($t2:i)
+.fi0:     
+.if1:     $t3:i = str[0 * :p]
+          $t4:i = $t3:i != '\0'
+          goto .el1 if not $t4:i
+.th1:     
+.if2:     $t5:i = str[0 * :p]
+          $t6:i = $t5:i == '-'
+          goto .el2 if not $t6:i
+.th2:     $t7:i = digit + 1
+          digit = $t7:i
+          neg = 1
+.fi2:     contin = 1
+.wh0:     $t8:i = contin
+          goto .od0 if not $t8:i
+.do0:     
+.if3:     $t9:i = str[digit * :p]
+          $t10:i = $t9:i == '\0'
+          goto .el3 if not $t10:i
+.th3:     contin = 0
+.el3:     $t11:p = str[digit * :p]
+          chr = $t11:i
+          $t12:i = digit + 1
+          digit = $t12:i
+.if4:     $t13:i = chr < '0'
+          goto .el4 if not $t13:i
+.th4:     contin = 0
+.el4:     
+.if5:     $t14:i = chr > '9'
+          goto .el5 if not $t14:i
+.th5:     contin = 0
+.el5:     $t15:i = + - '0'
+          num = $t15:i
+.fi5:     
+.fi4:     
+.fi3:     
+.od0:     
+.if6:     $t16:i = neg
+          goto .el6 if not $t16:i
+.th6:     $t17:i = - num
+          num = $t17:i
+.fi6:     
+.fi1:     return num
+          return 
+          .end
+main:     .function int
+          .param int argc
+          .param ptr argv
+          .local int argi
+          .local ptr arg
+          argi = 1
+          arg = nullptr
+.wh1:     $t18:i = argi < argc
+          goto .od1 if not $t18:i
+.do1:     $t19:p = argv[argi * :p]
+          arg = $t19:i
+          putstr(arg)
+          putstr(" = ")
+          atoi(arg)
+          putint($t20:i)
+          putchr('\n')
+          $t21:i = argi + 1
+          argi = $t21:i
+.od1:     return 0
+          return 
+          .end

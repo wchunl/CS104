@@ -1,0 +1,35 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+main:     .function int
+          .local int a
+          .local int b
+          .local int c
+          a = 3
+          b = 8
+          $t0:i = a + b
+          c = $t0:i
+          $t1:i = b + c
+          a = $t1:i
+          putint(a)
+          putchr('\n')
+          return 0
+          return 
+          .end

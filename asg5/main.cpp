@@ -124,6 +124,8 @@ int main (int argc, char** argv) {
     int fclose_rc = fclose(sym_out);
     if (fclose_rc != 0) exec::exit_status = EXIT_FAILURE;
 
+    // dump_tables();
+
     // generate oil file
     FILE* oil_out = fopen(oil_out_name.c_str(),"w");
     emit(oil_out, parser::root);

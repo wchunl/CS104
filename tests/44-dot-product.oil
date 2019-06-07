@@ -1,0 +1,63 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+dot_product:.function int
+          .param int size
+          .param ptr vec1
+          .param ptr vec2
+          .local int index
+          .local int dot
+          index = 0
+          dot = 0
+.wh0:     $t0:i = index < size
+          goto .od0 if not $t0:i
+.do0:     $t1:p = vec2[index * :p]
+          $t2:i = $t1:i * [
+          $t3:i = $t2:i + *
+          dot = $t3:i
+          $t4:i = index + 1
+          index = $t4:i
+.od0:     return dot
+          return 
+          .end
+main:     .function int
+          .local ptr vec1
+          .local ptr vec2
+          .local int index
+          malloc(4 * sizeof int)
+          vec1 = $t5:i
+          malloc(4 * sizeof int)
+          vec2 = $t6:i
+          index = 0
+.wh1:     $t7:i = index < 10
+          goto .od1 if not $t7:i
+.do1:     $t8:i = index + 10
+          vec1[index * :p] = $t8:i
+          $t9:i = index * 10
+          vec2[index * :p] = $t9:i
+          $t10:i = index + 1
+          index = $t10:i
+.od1:     $t11:i = 10
+          dot_product($t11:i)
+          putint($t12:i)
+          putchr('\n')
+          return 0
+          return 
+          .end

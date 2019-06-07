@@ -1,0 +1,62 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+main:     .function int
+          .local int prime
+          .local int index
+          .local ptr sieve
+          prime = 2
+          index = 2
+          malloc(4 * sizeof int)
+          sieve = $t0:i
+.wh0:     $t1:i = index < 100
+          goto .od0 if not $t1:i
+.do0:     sieve[index * :p] = 1
+          $t2:i = index + 1
+          index = $t2:i
+.od0:     
+.wh1:     $t3:i = prime < 100
+          goto .od1 if not $t3:i
+.do1:     
+.if0:     $t4:p = sieve[prime * :p]
+          goto .el0 if not $t4:i
+.th0:     $t5:i = prime * 2
+          index = $t5:i
+.wh2:     $t6:i = index < 100
+          goto .od2 if not $t6:i
+.do2:     sieve[index * :p] = 0
+          $t7:i = index + prime
+          index = $t7:i
+.od2:     
+.fi0:     $t8:i = prime + 1
+          prime = $t8:i
+.od1:     index = 2
+.wh3:     $t9:i = index < 100
+          goto .od3 if not $t9:i
+.do3:     
+.if1:     $t10:p = sieve[index * :p]
+          goto .el1 if not $t10:i
+.th1:     putint(index)
+          putchr('\n')
+.fi1:     $t11:i = index + 1
+          index = $t11:i
+.od3:     return 0
+          return 
+          .end

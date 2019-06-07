@@ -1,0 +1,50 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+main:     .function int
+          .local ptr fibonacci
+          .local int index
+          malloc(4 * sizeof int)
+          fibonacci = $t0:i
+          fibonacci[0 * :p] = 0
+          fibonacci[1 * :p] = 1
+          index = 2
+.wh0:     $t1:i = index < 30
+          goto .od0 if not $t1:i
+.do0:     $t2:p = fibonacci[- * :p]
+          $t3:i = $t2:i + [
+          fibonacci[index * :p] = $t3:i
+          $t4:i = index + 1
+          index = $t4:i
+.od0:     index = 0
+          putstr("Numeri di figlio Bonacci\n")
+.wh1:     $t5:i = index < 30
+          goto .od1 if not $t5:i
+.do1:     putstr("fibonacci[")
+          putint(index)
+          putstr("] = ")
+          $t6:p = fibonacci[index * :p]
+          putint($t6:i)
+          putchr('\n')
+          $t7:i = index + 1
+          index = $t7:i
+.od1:     return 0
+          return 
+          .end

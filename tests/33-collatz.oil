@@ -1,0 +1,55 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+collatz:  .function int
+          .param int n
+          .local int c
+          c = 0
+.wh0:     $t0:i = n != 1
+          goto .od0 if not $t0:i
+.do0:     $t1:i = c + 1
+          c = $t1:i
+.if0:     $t2:i = % == 1
+          goto .el0 if not $t2:i
+.th0:     $t3:i = * + 1
+          n = $t3:i
+.el0:     $t4:i = n / 2
+          n = $t4:i
+.fi0:     
+.od0:     return c
+          return 
+          .end
+test:     .function
+          .param int n
+          .local int c
+          collatz(n)
+          c = $t5:i
+          putstr("collatz(")
+          putint(n)
+          putstr(") = ")
+          putint(c)
+          putchr('\n')
+          .end
+main:     .function int
+          test(3)
+          test(50)
+          return 0
+          return 
+          .end

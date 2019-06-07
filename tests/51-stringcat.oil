@@ -1,0 +1,87 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+strlen:   .function int
+          .param ptr str
+          .local int len
+          len = 0
+.wh0:     $t0:i = str[len * :p]
+          $t1:i = $t0:i != '\0'
+          goto .od0 if not $t1:i
+.do0:     $t2:i = len + 1
+          len = $t2:i
+.od0:     return len
+          return 
+          .end
+strcat:   .function
+          .param ptr dest
+          .param ptr src
+          .local int pos
+          .local int srcix
+          strlen(dest)
+          pos = $t3:i
+          srcix = 0
+.wh1:     $t4:i = src[srcix * :p]
+          $t5:i = $t4:i != '\0'
+          goto .od1 if not $t5:i
+.do1:     $t6:p = src[srcix * :p]
+          dest[pos * :p] = $t6:i
+          $t7:i = pos + 1
+          pos = $t7:i
+          $t8:i = srcix + 1
+          srcix = $t8:i
+.od1:     dest[pos * :p] = '\0'
+          .end
+main:     .function int
+          .param int argc
+          .param ptr argv
+          .local int length
+          .local int argi
+          .local ptr concat
+          length = 0
+          argi = 1
+.wh2:     $t9:i = argi < argc
+          goto .od2 if not $t9:i
+.do2:     $t10:i = + + 2
+          length = $t10:i
+          $t11:i = argi + 1
+          argi = $t11:i
+.od2:     putstr("concat length = ")
+          putint(length)
+          putchr('\n')
+          malloc(4)
+          concat = $t12:i
+          argi = 1
+          putchr('[')
+.wh3:     $t13:i = argi < argc
+          goto .od3 if not $t13:i
+.do3:     $t14:i = concat
+          strcat($t14:i)
+          $t15:i = concat
+          strcat($t15:i)
+          $t16:i = concat
+          strcat($t16:i)
+          $t17:i = argi + 1
+          argi = $t17:i
+.od3:     putstr(concat)
+          putstr("]\n")
+          return 0
+          return 
+          .end

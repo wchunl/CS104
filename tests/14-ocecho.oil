@@ -1,0 +1,39 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+main:     .function int
+          .param int argc
+          .param ptr argv
+          .local int argi
+          argi = 1
+.wh0:     $t0:i = argi < argc
+          goto .od0 if not $t0:i
+.do0:     
+.if0:     $t1:i = argi > 1
+          goto .el0 if not $t1:i
+.th0:     putchr(' ')
+.fi0:     $t2:p = argv[argi * :p]
+          putstr($t2:i)
+          $t3:i = argi + 1
+          argi = $t3:i
+.od0:     putstr("\n")
+          return 0
+          return 
+          .end

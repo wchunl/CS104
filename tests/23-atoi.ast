@@ -163,7 +163,7 @@ ROOT "" (0.0.0)
 |   |   |   |   |   |   TOK_IDENT "neg" (7.27.11) int variable (7.6.12)
 |   |   |   |   |   |   '=' "=" (7.27.20) int vreg
 |   |   |   |   |   |   |   TOK_IDENT "num" (7.27.16) int variable (6.25.14)
-|   |   |   |   |   |   |   '-' "-" (7.27.22) ð†Ó int vreg
+|   |   |   |   |   |   |   '-' "-" (7.27.22)  ‡’ int vreg
 |   |   |   |   |   |   |   |   TOK_IDENT "num" (7.27.24) int variable (6.25.14)
 |   |   |   TOK_RETURN "return" (7.29.4)
 |   |   |   |   TOK_IDENT "num" (7.29.11) int variable (6.25.14)

@@ -1,0 +1,40 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+          .struct foo
+          .field int a
+          .end
+main:     .function int
+          .local int a
+          .local ptr b
+          a = 6
+          malloc (size of struct foo)
+          b = $t0:i
+          b->foo.a = 8
+          $t1:i = * + 6
+          a = $t1:i
+          putint(a)
+          putchr(' ')
+          $t2:p = b->foo.a
+          putint($t2:i)
+          putchr('\n')
+          return 0
+          return 
+          .end

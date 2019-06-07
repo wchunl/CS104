@@ -1,0 +1,32 @@
+fail:     .function
+          .param ptr expr
+          .param ptr file
+          .param int line
+          .end
+putchr:   .function
+          .param int chr
+          .end
+putint:   .function
+          .param int num
+          .end
+putstr:   .function
+          .param ptr str
+          .end
+getchr:   .function int
+          .end
+getstr:   .function
+          .end
+getln:    .function
+          .end
+main:     .function int
+          .local int count
+          count = 0
+.wh0:     $t0:i = count < 16
+          goto .od0 if not $t0:i
+.do0:     $t1:i = count + 1
+          count = $t1:i
+          putint(count)
+          putchr('\n')
+.od0:     return 0
+          return 
+          .end
