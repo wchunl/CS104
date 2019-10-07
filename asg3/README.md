@@ -14,7 +14,7 @@ Builds off of the previous assignment. A parser is added to the compiler project
 The abstract syntax tree is printed in readable format to an output file.
 
 ## Credits
-Institution: University of California, Santa Cruz
-Course: Fundamentals of Compiler Design I
-Professor: Wesley, Mackey
+Institution: University of California, Santa Cruz<br/>
+Course: Fundamentals of Compiler Design I<br/>
+Professor: Wesley, Mackey<br/>
 Student(s): Wai Chun Leung, Shineng Tang
