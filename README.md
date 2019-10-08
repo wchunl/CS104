@@ -5,7 +5,7 @@
 **Professor:** Wesley, Mackey<br/>
 **Student(s):** Wai Chun Leung, Shineng Tang
 
-### Assignment Breakdown (click to see more information)
+### Project Breakdown (click to see more information)
 1. [String Set and C Preprocessor](./asg1)
 2. [Lexical Analyzer using flex](./asg2)
 3. [LALR(1) Parser using bison](./asg3)
